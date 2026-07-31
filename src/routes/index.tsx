@@ -3,25 +3,28 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
-  ArrowUp,
   ArrowDown,
+  ArrowUp,
   Phone,
   Mail,
   Camera,
   MapPin,
   MessageCircle,
+  ChevronDown,
 } from "lucide-react";
+import guruLogo from "../assets/gurulogo.png";
+import { useStore } from "../store/useStore";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Shivansh Advertising — Graphic Design & Printing in Surat" },
+      { title: "Guru Graphics — Graphic Design & Printing in Surat" },
       {
         name: "description",
         content:
-          "Shivansh Advertising — a decade of premium graphic design and printing in Surat, India. Business cards, brochures, hoardings, offset & digital printing. Quality you see, trust you feel.",
+          "Guru Graphics — a decade of premium graphic design and printing in Surat, India. Business cards, brochures, hoardings, offset & digital printing. Quality you see, trust you feel.",
       },
-      { property: "og:title", content: "Shivansh Advertising — Graphic & Printing Studio" },
+      { property: "og:title", content: "Guru Graphics — Graphic & Printing Studio" },
       {
         property: "og:description",
         content:
@@ -41,28 +44,28 @@ const NAV = [
   { label: "Contact", id: "contact" },
 ];
 
-const SERVICES = [
-  "Stationery Works", "Business Card", "Rough Pad", "Acrylic Board",
-  "Catalogue", "Review Card", "Doctor File", "Hoarding",
-  "Brochure", "Label / Sticker", "Letter Head", "Banner / Eco Vinyl",
-  "Logo Design", "Product Packaging Box", "Flyer", "Social Media Post",
-  "Visiting Cards", "Flex Banners", "Offset Printing", "Digital Printing",
-];
-
-const CLIENTS = [
-  "Aksharam", "Made in Shivansh", "Infinity Associates", "Monkis", "Virani Textile",
-  "Uranus", "VR", "Shagun", "Primora Foil", "Bharat Lubricants", "AT Cables",
-  "Penguin", "IFT9", "Ananta", "Shree Enterprise", "Roopa", "Voltaic",
-  "Leeva Holidays", "Ujala", "Auto Mech", "Akhand Salon", "Sukhnitam",
-];
-
-const WA_LINK =
-  "https://wa.me/919978802372?text=Hi%20Shivansh%20Advertising!%20I%27d%20like%20to%20get%20a%20quote.";
-
 function Home() {
   const [active, setActive] = useState("home");
 
   useEffect(() => {
+    // Fetch data from backend
+    const fetchData = async () => {
+      try {
+        const [contentRes, servicesRes, contactRes] = await Promise.all([
+          fetch("http://localhost:4000/api/content").then((r) => r.json()),
+          fetch("http://localhost:4000/api/services").then((r) => r.json()),
+          fetch("http://localhost:4000/api/contact").then((r) => r.json()),
+        ]);
+
+        if (contentRes) useStore.getState().setContent(contentRes);
+        if (servicesRes && Array.isArray(servicesRes)) useStore.getState().setServices(servicesRes);
+        if (contactRes) useStore.getState().setContact(contactRes);
+      } catch (err) {
+        console.error("Failed to fetch dynamic content:", err);
+      }
+    };
+    fetchData();
+
     const sections = ["home", "about", "services", "clients", "contact"];
     const obs = new IntersectionObserver(
       (entries) => {
@@ -103,6 +106,9 @@ function Home() {
 /* ---------------- Header ---------------- */
 function Header({ active, onNav }: { active: string; onNav: (id: string) => void }) {
   const [open, setOpen] = useState(false);
+  const contact = useStore((s) => s.contact);
+  const waLink = `https://wa.me/${contact.whatsapp.replace(/\D/g, "")}?text=Hi%20Guru%20Graphics!`;
+
   return (
     <motion.header
       initial={{ y: -80, opacity: 0 }}
@@ -124,19 +130,18 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
             <button
               key={n.id}
               onClick={() => onNav(n.id)}
-              className="group relative px-4 py-2 text-[15px] font-medium text-navy transition-colors"
+              className="group relative px-4 py-2 text-[15px] font-medium text-primary transition-colors"
             >
               <span
                 className={
-                  active === n.id ? "text-orange" : "group-hover:text-orange"
+                  active === n.id ? "text-brand-blue" : "group-hover:text-brand-blue"
                 }
               >
                 {n.label}
               </span>
               <span
-                className={`absolute inset-x-4 -bottom-0.5 h-0.5 origin-left bg-orange transition-transform duration-300 ${
-                  active === n.id ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-                }`}
+                className={`absolute inset-x-4 -bottom-0.5 h-0.5 origin-left bg-brand-blue transition-transform duration-300 ${active === n.id ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                  }`}
               />
             </button>
           ))}
@@ -144,7 +149,7 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
 
         <div className="flex items-center gap-2">
           <a
-            href={WA_LINK}
+            href={waLink}
             target="_blank"
             rel="noreferrer"
             className="hidden items-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-transform hover:scale-105 md:inline-flex"
@@ -158,9 +163,9 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
             aria-label="Menu"
           >
             <div className="flex flex-col gap-1.5">
-              <span className={`h-0.5 w-5 bg-navy transition ${open ? "translate-y-2 rotate-45" : ""}`} />
-              <span className={`h-0.5 w-5 bg-navy transition ${open ? "opacity-0" : ""}`} />
-              <span className={`h-0.5 w-5 bg-navy transition ${open ? "-translate-y-2 -rotate-45" : ""}`} />
+              <span className={`h-0.5 w-5 bg-primary transition ${open ? "translate-y-2 rotate-45" : ""}`} />
+              <span className={`h-0.5 w-5 bg-primary transition ${open ? "opacity-0" : ""}`} />
+              <span className={`h-0.5 w-5 bg-primary transition ${open ? "-translate-y-2 -rotate-45" : ""}`} />
             </div>
           </button>
         </div>
@@ -180,13 +185,13 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
                   onNav(n.id);
                   setOpen(false);
                 }}
-                className="border-b border-border/60 py-3 text-left text-lg font-medium text-navy"
+                className="border-b border-border/60 py-3 text-left text-lg font-medium text-primary"
               >
                 {n.label}
               </button>
             ))}
             <a
-              href={WA_LINK}
+              href={waLink}
               target="_blank"
               rel="noreferrer"
               className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-semibold text-white"
@@ -202,25 +207,8 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
 
 function Logo() {
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex gap-0.5">
-        <span className="block h-8 w-1.5 rounded-sm bg-orange" />
-        <span className="block h-8 w-1.5 rounded-sm bg-red-500" />
-        <span className="block h-8 w-1.5 rounded-sm bg-navy" />
-      </div>
-      <div className="border-l border-border pl-3 leading-tight">
-        <div className="text-italic-display text-2xl font-bold text-navy">
-          Shivansh
-        </div>
-        <div className="text-[9px] font-semibold tracking-[0.25em] text-navy">
-          ADVERTISING
-        </div>
-        <div className="text-[8px] font-medium tracking-wider">
-          <span className="text-orange">QUALITY YOU SEE</span>
-          <span className="text-navy">...</span>
-          <span className="text-orange">TRUST YOU FEEL</span>
-        </div>
-      </div>
+    <div className="flex items-center">
+      <img src={guruLogo} alt="Guru Graphics Logo" className="h-10 w-auto" />
     </div>
   );
 }
@@ -269,14 +257,14 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-display text-[15vw] text-navy md:text-[9vw]"
+            className="text-display text-[15vw] text-primary md:text-[9vw]"
           >
             <div>YOUR</div>
             <motion.div
               initial={{ opacity: 0, x: -60, skewX: -10 }}
               animate={{ opacity: 1, x: 0, skewX: -8 }}
               transition={{ duration: 0.9, delay: 0.35 }}
-              className="text-italic-display font-bold text-orange"
+              className="text-italic-display font-bold text-brand-blue"
               style={{ transform: "skewX(-8deg)" }}
             >
               Brand's
@@ -303,21 +291,21 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
             transition={{ delay: 1 }}
             className="mt-10"
           >
-            <div className="h-0.5 w-24 bg-orange" />
+            <div className="h-0.5 w-24 bg-brand-blue" />
             <p className="mt-4 text-base text-muted-foreground md:text-lg">
-              All Type of Graphic Designing & Printing — Since 2014
+              {useStore((s) => s.content.heroSubtitle)}
             </p>
             <div className="mt-6 flex flex-wrap gap-4">
               <button
                 onClick={() => onNav("services")}
-                className="group inline-flex items-center gap-3 rounded-full border border-navy px-6 py-3 text-sm font-semibold text-navy transition-all hover:bg-navy hover:text-white"
+                className="group inline-flex items-center gap-3 rounded-full border border-primary px-6 py-3 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-white"
               >
                 See Our Work
                 <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-1" />
               </button>
               <button
                 onClick={() => onNav("contact")}
-                className="group inline-flex items-center gap-3 rounded-full bg-orange px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-orange/30 transition-transform hover:scale-105"
+                className="group inline-flex items-center gap-3 rounded-full bg-brand-blue px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-blue/30 transition-transform hover:scale-105"
               >
                 Contact Us
                 <ArrowUpRight className="h-4 w-4 transition-transform group-hover:rotate-45" />
@@ -332,6 +320,7 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
 
 /* ---------------- About ---------------- */
 function About() {
+  const content = useStore((s) => s.content);
   return (
     <section id="about" className="relative overflow-hidden py-24 md:py-32">
       <motion.div
@@ -339,7 +328,7 @@ function About() {
         whileInView={{ opacity: 0.15, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 1 }}
-        className="text-display absolute right-0 top-10 text-[18vw] text-orange/30 md:text-[12vw]"
+        className="text-display absolute right-0 top-10 text-[18vw] text-brand-blue/30 md:text-[12vw]"
       >
         2014
       </motion.div>
@@ -347,21 +336,17 @@ function About() {
       <div className="mx-auto grid max-w-7xl gap-14 px-6 md:grid-cols-2 md:px-16">
         <div>
           <FadeUp>
-            <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-orange">
-              <span className="h-px w-8 bg-orange" /> WHO WE ARE
+            <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-brand-blue">
+              <span className="h-px w-8 bg-brand-blue" /> WHO WE ARE
             </div>
           </FadeUp>
           <FadeUp delay={0.1}>
-            <h2 className="text-display text-5xl text-navy md:text-7xl">
-              DECADE OF <span className="text-orange">IMPACT.</span>
+            <h2 className="text-display text-5xl text-primary md:text-7xl">
+              DECADE OF <span className="text-brand-blue">IMPACT.</span>
             </h2>
           </FadeUp>
           <div className="mt-8 space-y-5 text-[15px] leading-relaxed text-muted-foreground md:text-base">
-            {[
-              "Founded in 2014, Shivansh Advertising has been dedicated to delivering high-quality printing and creative solutions to businesses of all sizes. What started as a small initiative has grown into a trusted name in the printing industry, known for reliability, innovation, and customer satisfaction.",
-              "We specialize in digital printing, offset printing, branding materials, and customized promotional products — helping clients create a strong visual identity that stands out in today's competitive market.",
-              "We combine modern technology with creative expertise to ensure every project meets the highest standards of quality. Our mission since 2014 has remained the same — to turn ideas into impactful prints that help businesses grow.",
-            ].map((t, i) => (
+            {content.aboutText.map((t, i) => (
               <FadeUp key={i} delay={0.2 + i * 0.1}>
                 <p>{t}</p>
               </FadeUp>
@@ -375,17 +360,15 @@ function About() {
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="relative w-full rounded-2xl bg-navy p-10 text-white shadow-2xl shadow-navy/30 md:p-14"
+            className="relative w-full rounded-2xl bg-primary p-10 text-white shadow-2xl shadow-primary/30 md:p-14"
           >
             <div className="text-italic-display text-3xl leading-snug md:text-5xl">
-              "Quality You See...
-              <br />
-              Trust You Feel."
+              "{content.tagline}"
             </div>
             <div className="mt-8 flex items-center gap-4">
-              <span className="h-px w-12 bg-orange" />
+              <span className="h-px w-12 bg-brand-blue" />
               <span className="text-xs font-semibold tracking-[0.25em] text-white/70">
-                SHIVANSH ADVERTISING, SURAT
+                GURU GRAPHICS, SURAT
               </span>
             </div>
           </motion.div>
@@ -412,7 +395,7 @@ function Stats() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.12, duration: 0.6 }}
-            className="flex items-center gap-4 rounded-full bg-navy px-7 py-4 shadow-lg shadow-navy/20"
+            className="flex items-center gap-4 rounded-full bg-primary px-7 py-4 shadow-lg shadow-primary/20"
           >
             <Counter to={s.n} />
             <span className="text-xs font-semibold tracking-[0.3em] text-white/70">
@@ -451,7 +434,7 @@ function Counter({ to }: { to: number }) {
     return () => io.disconnect();
   }, [to]);
   return (
-    <span ref={ref} className="text-display text-2xl text-orange">
+    <span ref={ref} className="text-display text-2xl text-brand-blue">
       {val}+
     </span>
   );
@@ -459,34 +442,36 @@ function Counter({ to }: { to: number }) {
 
 /* ---------------- Services ---------------- */
 function Services({ onNav }: { onNav: (id: string) => void }) {
+  const allServices = useStore((s) => s.services);
+  const services = allServices.filter((x) => x.active);
   return (
     <section id="services" className="py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6 md:px-16">
         <FadeUp>
-          <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-orange">
-            <span className="h-px w-8 bg-orange" /> DO YOU NEED A PROFESSIONAL
+          <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-brand-blue">
+            <span className="h-px w-8 bg-brand-blue" /> DO YOU NEED A PROFESSIONAL
           </div>
         </FadeUp>
         <FadeUp delay={0.1}>
-          <h2 className="text-display text-5xl text-navy md:text-8xl">
+          <h2 className="text-display text-5xl text-primary md:text-8xl">
             GRAPHIC & PRINTING WORKS
           </h2>
         </FadeUp>
 
         <div className="mt-16 grid grid-cols-1 divide-y divide-border sm:grid-cols-2 sm:divide-x lg:grid-cols-4">
-          {SERVICES.map((s, i) => (
+          {services.map((s, i) => (
             <motion.button
-              key={s}
+              key={s.id}
               onClick={() => onNav("contact")}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: (i % 8) * 0.05, duration: 0.5 }}
-              className="group relative flex items-center gap-4 border-b border-border py-6 text-left transition-colors hover:bg-navy/[0.03] sm:px-6"
+              className="group relative flex items-center gap-4 border-b border-border py-6 text-left transition-colors hover:bg-primary/[0.03] sm:px-6"
             >
-              <ArrowUpRight className="h-5 w-5 shrink-0 text-orange transition-transform group-hover:rotate-45" />
-              <span className="text-lg font-semibold text-navy transition-colors group-hover:text-orange">
-                {s}
+              <ArrowUpRight className="h-5 w-5 shrink-0 text-brand-blue transition-transform group-hover:rotate-45" />
+              <span className="text-lg font-semibold text-primary transition-colors group-hover:text-brand-blue">
+                {s.name}
               </span>
             </motion.button>
           ))}
@@ -504,25 +489,26 @@ function Services({ onNav }: { onNav: (id: string) => void }) {
 
 /* ---------------- Clients ---------------- */
 function Clients() {
-  const row1 = CLIENTS.slice(0, 11);
-  const row2 = CLIENTS.slice(11);
+  const clients = useStore((s) => s.content.clients);
+  const row1 = clients.slice(0, Math.ceil(clients.length / 2));
+  const row2 = clients.slice(Math.ceil(clients.length / 2));
   return (
     <section id="clients" className="overflow-hidden py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6 md:px-16">
         <FadeUp>
-          <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-orange">
-            <span className="h-px w-8 bg-orange" /> TRUSTED BY
+          <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-brand-blue">
+            <span className="h-px w-8 bg-brand-blue" /> TRUSTED BY
           </div>
         </FadeUp>
         <div className="flex flex-wrap items-end justify-between gap-6">
           <FadeUp delay={0.1}>
-            <h2 className="text-display text-5xl text-navy md:text-7xl">
+            <h2 className="text-display text-5xl text-primary md:text-7xl">
               BRANDS THAT BELIEVE IN US.
             </h2>
           </FadeUp>
           <FadeUp delay={0.2}>
             <p className="max-w-sm text-sm text-muted-foreground">
-              500+ brands have trusted us since 2014 — from neighbourhood shops
+              {clients.length}+ brands have trusted us since 2014 — from neighbourhood shops
               to national labels.
             </p>
           </FadeUp>
@@ -550,7 +536,7 @@ function Marquee({ items, reverse }: { items: string[]; reverse?: boolean }) {
             key={i}
             className="grid h-24 w-52 shrink-0 place-items-center rounded-xl border border-border bg-card px-6 shadow-sm"
           >
-            <span className="text-center text-sm font-bold tracking-wider text-navy/70">
+            <span className="text-center text-sm font-bold tracking-wider text-primary/70">
               {name.toUpperCase()}
             </span>
           </div>
@@ -562,6 +548,42 @@ function Marquee({ items, reverse }: { items: string[]; reverse?: boolean }) {
 
 /* ---------------- Contact ---------------- */
 function Contact() {
+  const contact = useStore((s) => s.contact);
+  const allServices = useStore((s) => s.services);
+  const services = allServices.filter((x) => x.active);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const waLink = `https://wa.me/${contact.whatsapp.replace(/\D/g, "")}?text=Hi%20Guru%20Graphics!%20I%27d%20like%20to%20get%20a%20quote.`;
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    const fd = new FormData(e.currentTarget);
+    try {
+      await fetch("http://localhost:4000/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: fd.get("name") as string,
+          phone: fd.get("phone") as string,
+          email: (fd.get("email") as string) || "",
+          service: fd.get("service") as string,
+          project: fd.get("project") as string,
+        }),
+      });
+      setSubmitted(true);
+      (e.target as HTMLFormElement).reset();
+      setTimeout(() => setSubmitted(false), 5000);
+    } catch {
+      setError("Could not send enquiry. Please try WhatsApp or call us directly.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <section id="contact" className="relative overflow-hidden py-24 md:py-32">
       <motion.div
@@ -569,21 +591,21 @@ function Contact() {
         whileInView={{ opacity: 0.08 }}
         viewport={{ once: true }}
         transition={{ duration: 1 }}
-        className="text-display pointer-events-none absolute inset-x-0 top-10 text-center text-[22vw] text-navy"
+        className="text-display pointer-events-none absolute inset-x-0 top-10 text-center text-[22vw] text-primary"
       >
         SAY HELLO
       </motion.div>
 
       <div className="mx-auto max-w-7xl px-6 md:px-16">
         <FadeUp>
-          <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-orange">
-            <span className="h-px w-8 bg-orange" /> GET IN TOUCH
+          <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-brand-blue">
+            <span className="h-px w-8 bg-brand-blue" /> GET IN TOUCH
           </div>
         </FadeUp>
         <FadeUp delay={0.1}>
-          <h2 className="text-display text-5xl text-navy md:text-8xl">
+          <h2 className="text-display text-5xl text-primary md:text-8xl">
             LET'S CREATE{" "}
-            <span className="text-italic-display font-bold text-orange">
+            <span className="text-italic-display font-bold text-brand-blue">
               Something
             </span>{" "}
             GREAT.
@@ -594,33 +616,33 @@ function Contact() {
           {/* Left cards */}
           <div className="space-y-5">
             <a
-              href={WA_LINK}
+              href={waLink}
               target="_blank"
               rel="noreferrer"
               className="group flex items-center justify-between rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
             >
               <div className="flex items-center gap-4">
-                <span className="grid h-12 w-12 place-items-center rounded-full bg-orange text-white">
+                <span className="grid h-12 w-12 place-items-center rounded-full bg-brand-blue text-white">
                   <MessageCircle className="h-5 w-5" />
                 </span>
                 <div>
                   <div className="text-[11px] font-semibold tracking-[0.25em] text-muted-foreground">
                     WHATSAPP US
                   </div>
-                  <div className="text-lg font-bold text-navy">+91 99788-02372</div>
+                  <div className="text-lg font-bold text-primary">{contact.phone}</div>
                 </div>
               </div>
-              <ArrowUpRight className="h-5 w-5 text-navy transition-transform group-hover:rotate-45" />
+              <ArrowUpRight className="h-5 w-5 text-primary transition-transform group-hover:rotate-45" />
             </a>
 
             <div className="grid gap-5 sm:grid-cols-2">
-              <InfoCard icon={<Phone className="h-4 w-4" />} label="OFFICE" value="+91 99248 94072" />
-              <InfoCard icon={<Mail className="h-4 w-4" />} label="EMAIL" value="info@shivanshadvertising.in" />
-              <InfoCard icon={<Camera className="h-4 w-4" />} label="INSTAGRAM" value="@shivansh_advertising72" />
+              <InfoCard icon={<Phone className="h-4 w-4" />} label="OFFICE" value={contact.phone} />
+              <InfoCard icon={<Mail className="h-4 w-4" />} label="EMAIL" value={contact.email} />
+              <InfoCard icon={<Camera className="h-4 w-4" />} label="INSTAGRAM" value={contact.instagram} />
               <InfoCard
                 icon={<MapPin className="h-4 w-4" />}
                 label="STUDIO"
-                value="105, 1st Floor, Silverstone Arcade, B/s. Kantheriya Hanuman Temple, Causeway Road, Katargam, Surat-395004."
+                value={contact.address}
               />
             </div>
           </div>
@@ -631,16 +653,25 @@ function Contact() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert("Thanks — we'll be in touch within 24 hours.");
-            }}
-            className="rounded-3xl border border-border bg-card p-8 shadow-xl shadow-navy/5 md:p-10"
+            onSubmit={handleSubmit}
+            className="relative z-10 rounded-3xl border border-border bg-card p-8 shadow-xl shadow-primary/5 md:p-10"
           >
-            <h3 className="text-display text-3xl text-navy">SEND US A MESSAGE.</h3>
+            <h3 className="text-display text-3xl text-primary">SEND US A MESSAGE.</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               We typically respond within 24 hours.
             </p>
+
+            {submitted && (
+              <div className="mt-4 rounded-xl bg-brand-green/10 border border-brand-green/30 px-4 py-3 text-sm font-medium text-brand-green">
+                ✓ Thank you! Your enquiry has been received. We'll be in touch shortly.
+              </div>
+            )}
+
+            {error && (
+              <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm font-medium text-red-700">
+                ⚠ {error}
+              </div>
+            )}
 
             <div className="mt-8 grid gap-6 sm:grid-cols-2">
               <Field label="Full Name *" name="name" required />
@@ -649,18 +680,19 @@ function Contact() {
               <SelectField
                 label="Service Needed *"
                 name="service"
-                options={["Logo Design", "Banner Printing", "Visiting Cards", "Hoarding", "Offset Printing", "Other"]}
+                options={services.map((s) => s.name)}
               />
               <div className="sm:col-span-2">
-                <Field label="Tell us about your project *" name="project" required />
+                <Field label="Tell us about your project *" name="project" as="textarea" required />
               </div>
             </div>
 
             <button
               type="submit"
-              className="group mt-10 inline-flex items-center gap-3 rounded-full bg-orange px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-orange/30 transition-transform hover:scale-105"
+              disabled={submitting}
+              className="group mt-10 inline-flex items-center gap-3 rounded-full bg-brand-blue px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-brand-blue/30 transition-transform hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Send Enquiry
+              {submitting ? "Sending..." : "Send Enquiry"}
               <ArrowUpRight className="h-4 w-4 transition-transform group-hover:rotate-45" />
             </button>
           </motion.form>
@@ -673,13 +705,13 @@ function Contact() {
 function InfoCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <div className="mb-3 grid h-8 w-8 place-items-center rounded-full bg-orange/10 text-orange">
+      <div className="mb-3 grid h-8 w-8 place-items-center rounded-full bg-brand-blue/10 text-brand-blue">
         {icon}
       </div>
       <div className="text-[10px] font-semibold tracking-[0.25em] text-muted-foreground">
         {label}
       </div>
-      <div className="mt-1 text-sm font-semibold text-navy">{value}</div>
+      <div className="mt-1 text-sm font-semibold text-primary">{value}</div>
     </div>
   );
 }
@@ -689,51 +721,95 @@ function Field({
   name,
   type = "text",
   required,
+  as = "input",
 }: {
   label: string;
   name: string;
   type?: string;
   required?: boolean;
+  as?: "input" | "textarea";
 }) {
+  const Component = as;
   return (
     <label className="block">
       <span className="text-xs font-medium text-muted-foreground">{label}</span>
-      <input
-        type={type}
+      <Component
+        type={as === "input" ? type : undefined}
         name={name}
         required={required}
-        className="mt-1 w-full border-0 border-b border-border bg-transparent py-2 text-navy outline-none transition-colors focus:border-orange"
+        rows={as === "textarea" ? 4 : undefined}
+        className="mt-1 w-full border-0 border-b border-border bg-transparent py-2 text-primary outline-none transition-colors focus:border-brand-blue resize-none"
       />
     </label>
   );
 }
 
 function SelectField({ label, name, options }: { label: string; name: string; options: string[] }) {
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
   return (
-    <label className="block">
+    <div className="relative block" ref={ref}>
       <span className="text-xs font-medium text-muted-foreground">{label}</span>
-      <select
-        name={name}
-        className="mt-1 w-full border-0 border-b border-border bg-transparent py-2 text-navy outline-none transition-colors focus:border-orange"
+      <input type="hidden" name={name} value={selected} />
+      
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="mt-1 flex w-full items-center justify-between border-0 border-b border-border bg-transparent py-2 text-left text-primary outline-none transition-colors focus:border-brand-blue"
       >
-        {options.map((o) => (
-          <option key={o}>{o}</option>
-        ))}
-      </select>
-    </label>
+        <span className={selected ? "text-primary" : "text-muted-foreground/50"}>
+          {selected || "Select a service..."}
+        </span>
+        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-60 overflow-auto rounded-xl border border-border bg-card p-2 shadow-xl shadow-primary/10">
+          {options.map((o) => (
+            <button
+              key={o}
+              type="button"
+              onClick={() => {
+                setSelected(o);
+                setOpen(false);
+              }}
+              className={`w-full rounded-md px-4 py-2.5 text-left text-sm transition-colors hover:bg-primary/[0.04] ${
+                selected === o ? "bg-primary/[0.04] font-medium text-brand-blue" : "text-primary"
+              }`}
+            >
+              {o}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
 /* ---------------- Footer ---------------- */
 function Footer({ onNav }: { onNav: (id: string) => void }) {
+  const contact = useStore((s) => s.contact);
+  const content = useStore((s) => s.content);
+  const waLink = `https://wa.me/${contact.whatsapp.replace(/\D/g, "")}?text=Hi%20Guru%20Graphics!%20I%27d%20like%20to%20get%20a%20quote.`;
   return (
-    <footer className="relative overflow-hidden border-t-4 border-orange pt-16 pb-8">
+    <footer className="relative overflow-hidden border-t-4 border-brand-blue pt-16 pb-8">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 md:grid-cols-3 md:px-16">
         <div>
           <Logo />
-          <p className="text-italic-display mt-6 text-xl text-navy">
-            "Quality You See...{" "}
-            <span className="text-orange">Trust You Feel.</span>"
+          <p className="text-italic-display mt-6 text-xl text-primary">
+            "{content.tagline}"
           </p>
           <p className="mt-4 max-w-xs text-sm text-muted-foreground">
             Premium printing & graphic design from Surat, India — since 2014.
@@ -741,13 +817,13 @@ function Footer({ onNav }: { onNav: (id: string) => void }) {
         </div>
 
         <div>
-          <div className="text-[11px] font-semibold tracking-[0.3em] text-orange">EXPLORE</div>
+          <div className="text-[11px] font-semibold tracking-[0.3em] text-brand-blue">EXPLORE</div>
           <ul className="mt-4 space-y-3">
             {NAV.map((n) => (
               <li key={n.id}>
                 <button
                   onClick={() => onNav(n.id)}
-                  className="text-navy hover:text-orange"
+                  className="text-primary hover:text-brand-blue"
                 >
                   {n.label}
                 </button>
@@ -757,18 +833,15 @@ function Footer({ onNav }: { onNav: (id: string) => void }) {
         </div>
 
         <div>
-          <div className="text-[11px] font-semibold tracking-[0.3em] text-orange">REACH US</div>
-          <ul className="mt-4 space-y-3 text-sm text-navy">
-            <li>+91 99788-02372</li>
-            <li>info@shivanshadvertising.in</li>
-            <li className="text-muted-foreground">
-              105, 1st Floor, Silverstone Arcade, B/s. Kantheriya Hanuman Temple,
-              Causeway Road, Katargam, Surat-395004.
-            </li>
+          <div className="text-[11px] font-semibold tracking-[0.3em] text-brand-blue">REACH US</div>
+          <ul className="mt-4 space-y-3 text-sm text-primary">
+            <li>{contact.phone}</li>
+            <li>{contact.email}</li>
+            <li className="text-muted-foreground">{contact.address}</li>
           </ul>
           <div className="mt-5 flex gap-3">
             <a
-              href={WA_LINK}
+              href={waLink}
               target="_blank"
               rel="noreferrer"
               className="grid h-10 w-10 place-items-center rounded-full border border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white"
@@ -776,7 +849,9 @@ function Footer({ onNav }: { onNav: (id: string) => void }) {
               <MessageCircle className="h-4 w-4" />
             </a>
             <a
-              href="#"
+              href={`https://instagram.com/${contact.instagram.replace("@", "")}`}
+              target="_blank"
+              rel="noreferrer"
               className="grid h-10 w-10 place-items-center rounded-full border border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
             >
               <Camera className="h-4 w-4" />
@@ -785,16 +860,17 @@ function Footer({ onNav }: { onNav: (id: string) => void }) {
         </div>
       </div>
 
-      <div className="text-display pointer-events-none mt-12 select-none overflow-hidden text-center text-[18vw] leading-none text-navy/[0.06]">
-        SHIVANSH ADVERTISING
+      <div className="text-display pointer-events-none mt-12 select-none overflow-hidden text-center text-[18vw] leading-none text-primary/[0.06]">
+        GURU GRAPHICS
       </div>
 
       <div className="mx-auto max-w-7xl px-6 text-center text-xs text-muted-foreground md:px-16">
-        © {new Date().getFullYear()} Shivansh Advertising · Designed with care.
+        © {new Date().getFullYear()} Guru Graphics · Designed with care.
       </div>
     </footer>
   );
 }
+
 
 /* ---------------- Utilities ---------------- */
 function FadeUp({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -822,7 +898,7 @@ function BackToTop() {
       initial={false}
       animate={{ opacity: show ? 1 : 0, scale: show ? 1 : 0.5 }}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed bottom-6 right-6 z-40 grid h-12 w-12 place-items-center rounded-full bg-orange text-white shadow-lg shadow-orange/40"
+      className="fixed bottom-6 right-6 z-40 grid h-12 w-12 place-items-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/40"
       aria-label="Back to top"
     >
       <ArrowUp className="h-5 w-5" />
