@@ -99,6 +99,17 @@ function Home() {
       <Contact />
       <Footer onNav={scrollTo} />
       <BackToTop />
+      
+      {/* Floating WhatsApp Button */}
+      <a
+        href={`https://wa.me/${useStore.getState().contact?.whatsapp?.replace(/\D/g, "")}?text=Hi%20Guru%20Graphics!`}
+        target="_blank"
+        rel="noreferrer"
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-emerald-500/30 transition-transform hover:scale-110 md:bottom-10 md:right-10"
+        aria-label="WhatsApp Us"
+      >
+        <MessageCircle className="h-7 w-7" />
+      </a>
     </div>
   );
 }
@@ -125,38 +136,30 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
           <Logo />
         </button>
 
-        <nav className="hidden items-center gap-2 lg:flex">
-          {NAV.map((n) => (
-            <button
-              key={n.id}
-              onClick={() => onNav(n.id)}
-              className="group relative px-4 py-2 text-[15px] font-medium text-primary transition-colors"
-            >
-              <span
-                className={
-                  active === n.id ? "text-brand-blue" : "group-hover:text-brand-blue"
-                }
+        <div className="flex items-center gap-2 md:gap-6">
+          <nav className="hidden items-center gap-4 lg:flex">
+            {NAV.map((n) => (
+              <button
+                key={n.id}
+                onClick={() => onNav(n.id)}
+                className="group relative px-2 py-2 text-[15px] font-medium text-primary transition-colors"
               >
-                {n.label}
-              </span>
-              <span
-                className={`absolute inset-x-4 -bottom-0.5 h-0.5 origin-left bg-brand-blue transition-transform duration-300 ${active === n.id ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                <span
+                  className={
+                    active === n.id ? "text-brand-blue" : "group-hover:text-brand-blue"
+                  }
+                >
+                  {n.label}
+                </span>
+                <span
+                  className={`absolute inset-x-2 -bottom-0.5 h-0.5 origin-left bg-brand-blue transition-transform duration-300 ${
+                    active === n.id ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                   }`}
-              />
-            </button>
-          ))}
-        </nav>
+                />
+              </button>
+            ))}
+          </nav>
 
-        <div className="flex items-center gap-2">
-          <a
-            href={waLink}
-            target="_blank"
-            rel="noreferrer"
-            className="hidden items-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-transform hover:scale-105 md:inline-flex"
-          >
-            <MessageCircle className="h-4 w-4" strokeWidth={2.5} />
-            WhatsApp Us
-          </a>
           <button
             onClick={() => setOpen((o) => !o)}
             className="grid h-10 w-10 place-items-center rounded-md border border-border lg:hidden"
@@ -190,14 +193,7 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
                 {n.label}
               </button>
             ))}
-            <a
-              href={waLink}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-semibold text-white"
-            >
-              <MessageCircle className="h-4 w-4" /> WhatsApp Us
-            </a>
+            {/* Mobile menu items */}
           </div>
         </motion.div>
       )}
@@ -224,25 +220,51 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
     <section
       id="home"
       ref={ref}
-      className="relative flex min-h-screen items-center overflow-hidden pt-24"
+      className="relative flex min-h-screen items-center pt-24"
     >
-      {/* decorative sweeping arc */}
-      <motion.svg
-        className="absolute right-0 top-1/4 h-[700px] w-[700px] opacity-40"
-        viewBox="0 0 700 700"
-        initial={{ rotate: -10, opacity: 0 }}
-        animate={{ rotate: 0, opacity: 0.4 }}
-        transition={{ duration: 1.5 }}
-      >
-        <path
-          d="M50,500 Q350,100 650,400"
-          stroke="var(--orange)"
-          strokeWidth="80"
-          fill="none"
-          strokeLinecap="round"
-          opacity="0.25"
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Background Glowing Orbs */}
+        <motion.div
+          animate={{ y: [-10, 10, -10], rotate: [0, 5, -5, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute left-[10%] top-[20%] h-32 w-32 rounded-full bg-brand-blue/5 blur-3xl md:h-64 md:w-64 md:bg-brand-blue/10"
         />
-      </motion.svg>
+        <motion.div
+          animate={{ y: [10, -10, 10], rotate: [0, -5, 5, 0] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[10%] right-[15%] h-40 w-40 rounded-full bg-brand-magenta/5 blur-3xl md:h-80 md:w-80 md:bg-brand-magenta/10"
+        />
+
+        {/* decorative sweeping arc */}
+        <motion.svg
+          className="absolute right-0 top-1/4 h-[700px] w-[700px] opacity-20 md:opacity-40"
+          viewBox="0 0 700 700"
+          initial={{ rotate: -10, opacity: 0 }}
+          animate={{ rotate: 0, opacity: 0.4 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+        >
+          <motion.path
+            d="M50,500 Q350,100 650,400"
+            stroke="var(--color-brand-yellow)"
+            strokeWidth="60"
+            fill="none"
+            strokeLinecap="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 2, ease: "easeInOut" }}
+          />
+          <motion.path
+            d="M100,550 Q400,150 700,450"
+            stroke="var(--color-brand-blue)"
+            strokeWidth="30"
+            fill="none"
+            strokeLinecap="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 2.2, ease: "easeInOut", delay: 0.2 }}
+          />
+        </motion.svg>
+      </div>
 
       <span className="absolute left-4 top-1/2 hidden -translate-y-1/2 -rotate-90 text-xs font-semibold tracking-[0.4em] text-muted-foreground md:block">
         SURAT, INDIA — EST. 2014
@@ -254,32 +276,45 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
       <motion.div style={{ y, opacity }} className="mx-auto w-full max-w-7xl px-6 md:px-16">
         <div className="max-w-4xl">
           <motion.h1
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
+            }}
             className="text-display text-[15vw] text-primary md:text-[9vw]"
           >
-            <div>YOUR</div>
             <motion.div
-              initial={{ opacity: 0, x: -60, skewX: -10 }}
-              animate={{ opacity: 1, x: 0, skewX: -8 }}
-              transition={{ duration: 0.9, delay: 0.35 }}
+              variants={{
+                hidden: { opacity: 0, y: 40 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
+              }}
+            >
+              YOUR
+            </motion.div>
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, x: -60, skewX: -10 },
+                visible: { opacity: 1, x: 0, skewX: -8, transition: { duration: 0.9, ease: "easeOut" } },
+              }}
               className="text-italic-display font-bold text-brand-blue"
               style={{ transform: "skewX(-8deg)" }}
             >
               Brand's
             </motion.div>
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.55 }}
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
+              }}
             >
               FIRST IMPRESSION
             </motion.div>
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.7 }}
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
+              }}
             >
               STARTS HERE.
             </motion.div>
@@ -295,20 +330,23 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
             <p className="mt-4 text-base text-muted-foreground md:text-lg">
               {useStore((s) => s.content.heroSubtitle)}
             </p>
-            <div className="mt-6 flex flex-wrap gap-4">
+            <div className="mt-8 flex flex-wrap gap-5">
               <button
                 onClick={() => onNav("services")}
-                className="group inline-flex items-center gap-3 rounded-full border border-primary px-6 py-3 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-white"
+                className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full border border-primary bg-transparent px-7 py-3.5 text-sm font-semibold text-primary transition-all hover:text-white"
               >
-                See Our Work
-                <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-1" />
+                <span className="absolute inset-0 -translate-x-full bg-primary transition-transform duration-300 ease-out group-hover:translate-x-0" />
+                <span className="relative z-10 flex items-center gap-3">
+                  See Our Work
+                  <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-1" />
+                </span>
               </button>
               <button
                 onClick={() => onNav("contact")}
-                className="group inline-flex items-center gap-3 rounded-full bg-brand-blue px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-blue/30 transition-transform hover:scale-105"
+                className="group relative inline-flex items-center gap-3 rounded-full bg-brand-blue px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-blue/30 transition-all hover:-translate-y-1 hover:shadow-brand-blue/40"
               >
                 Contact Us
-                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:rotate-45" />
+                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </button>
             </div>
           </motion.div>
@@ -322,7 +360,7 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
 function About() {
   const content = useStore((s) => s.content);
   return (
-    <section id="about" className="relative overflow-hidden py-24 md:py-32">
+    <section id="about" className="relative overflow-hidden">
       <motion.div
         initial={{ opacity: 0, x: 100 }}
         whileInView={{ opacity: 0.15, x: 0 }}
@@ -362,15 +400,20 @@ function About() {
             transition={{ duration: 0.8 }}
             className="relative w-full rounded-2xl bg-primary p-10 text-white shadow-2xl shadow-primary/30 md:p-14"
           >
-            <div className="text-italic-display text-3xl leading-snug md:text-5xl">
-              "{content.tagline}"
-            </div>
-            <div className="mt-8 flex items-center gap-4">
-              <span className="h-px w-12 bg-brand-blue" />
-              <span className="text-xs font-semibold tracking-[0.25em] text-white/70">
-                GURU GRAPHICS, SURAT
-              </span>
-            </div>
+            <motion.div
+              animate={{ y: [0, -5, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <div className="text-italic-display text-3xl leading-snug md:text-5xl">
+                "{content.tagline}"
+              </div>
+              <div className="mt-8 flex items-center gap-4">
+                <span className="h-px w-12 bg-brand-blue" />
+                <span className="text-xs font-semibold tracking-[0.25em] text-white/70">
+                  GURU GRAPHICS, SURAT
+                </span>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </div>
@@ -395,7 +438,7 @@ function Stats() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.12, duration: 0.6 }}
-            className="flex items-center gap-4 rounded-full bg-primary px-7 py-4 shadow-lg shadow-primary/20"
+            className="flex items-center gap-4 rounded-full bg-primary px-7 py-4 shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-primary/40"
           >
             <Counter to={s.n} />
             <span className="text-xs font-semibold tracking-[0.3em] text-white/70">
@@ -445,7 +488,7 @@ function Services({ onNav }: { onNav: (id: string) => void }) {
   const allServices = useStore((s) => s.services);
   const services = allServices.filter((x) => x.active);
   return (
-    <section id="services" className="py-24 md:py-32">
+    <section id="services" className="py-14 md:py-12">
       <div className="mx-auto max-w-7xl px-6 md:px-16">
         <FadeUp>
           <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-brand-blue">
@@ -467,7 +510,7 @@ function Services({ onNav }: { onNav: (id: string) => void }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: (i % 8) * 0.05, duration: 0.5 }}
-              className="group relative flex items-center gap-4 border-b border-border py-6 text-left transition-colors hover:bg-primary/[0.03] sm:px-6"
+              className="group relative flex items-center gap-4 border-b border-border py-6 text-left transition-all hover:bg-brand-blue/[0.04] sm:px-6 hover:pl-8"
             >
               <ArrowUpRight className="h-5 w-5 shrink-0 text-brand-blue transition-transform group-hover:rotate-45" />
               <span className="text-lg font-semibold text-primary transition-colors group-hover:text-brand-blue">
@@ -493,7 +536,7 @@ function Clients() {
   const row1 = clients.slice(0, Math.ceil(clients.length / 2));
   const row2 = clients.slice(Math.ceil(clients.length / 2));
   return (
-    <section id="clients" className="overflow-hidden py-24 md:py-32">
+    <section id="clients" className="overflow-hidden py-14 md:py-12">
       <div className="mx-auto max-w-7xl px-6 md:px-16">
         <FadeUp>
           <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-brand-blue">
@@ -585,7 +628,7 @@ function Contact() {
   };
 
   return (
-    <section id="contact" className="relative overflow-hidden py-24 md:py-32">
+    <section id="contact" className="relative overflow-hidden py-14 md:py-12">
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 0.08 }}
@@ -763,7 +806,7 @@ function SelectField({ label, name, options }: { label: string; name: string; op
     <div className="relative block" ref={ref}>
       <span className="text-xs font-medium text-muted-foreground">{label}</span>
       <input type="hidden" name={name} value={selected} />
-      
+
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -785,9 +828,8 @@ function SelectField({ label, name, options }: { label: string; name: string; op
                 setSelected(o);
                 setOpen(false);
               }}
-              className={`w-full rounded-md px-4 py-2.5 text-left text-sm transition-colors hover:bg-primary/[0.04] ${
-                selected === o ? "bg-primary/[0.04] font-medium text-brand-blue" : "text-primary"
-              }`}
+              className={`w-full rounded-md px-4 py-2.5 text-left text-sm transition-colors hover:bg-primary/[0.04] ${selected === o ? "bg-primary/[0.04] font-medium text-brand-blue" : "text-primary"
+                }`}
             >
               {o}
             </button>
@@ -898,7 +940,7 @@ function BackToTop() {
       initial={false}
       animate={{ opacity: show ? 1 : 0, scale: show ? 1 : 0.5 }}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed bottom-6 right-6 z-40 grid h-12 w-12 place-items-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/40"
+      className="fixed bottom-24 right-6 md:bottom-28 md:right-10 z-40 grid h-12 w-12 place-items-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/40 transition-colors hover:bg-brand-blue/90"
       aria-label="Back to top"
     >
       <ArrowUp className="h-5 w-5" />
