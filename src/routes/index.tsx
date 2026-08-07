@@ -141,6 +141,7 @@ function Home() {
       <Contact />
       <Footer onNav={scrollTo} />
       <BackToTop />
+      <CustomCursor />
       
       {/* Floating WhatsApp Button */}
       <a
@@ -292,7 +293,7 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
     <section
       id="home"
       ref={ref}
-      className="relative mx-auto max-w-7xl overflow-hidden px-6 pb-[90px] pt-[150px] md:px-14"
+      className="relative mx-auto max-w-7xl overflow-hidden px-6 pb-[90px] pt-[150px] md:px-14 bg-[radial-gradient(#e5e7eb_1.5px,transparent_1.5px)] bg-[size:24px_24px]"
     >
       {/* Parallax floating shapes */}
       <FloatingShapes />
@@ -313,7 +314,7 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
 
       {/* CMYK Swatches */}
       <div className="absolute right-14 top-[150px] hidden flex-col gap-2.5 lg:flex">
-        <motion.div animate={{ rotate: 4, x: 30 }} transition={{ duration: 1 }} className="swatch sw1 bg-brand-yellow text-[#5c4400]">C 0 M 20<br/>Y 100 K 0</motion.div>
+        <motion.div animate={{ rotate: 4, x: 30 }} transition={{ duration: 1 }} className="swatch sw1 bg-brand-yellow text-[#5a4000]">C 0 M 20<br/>Y 100 K 0</motion.div>
         <motion.div animate={{ rotate: -3, x: 70 }} transition={{ duration: 1.2 }} className="swatch sw2 bg-brand-magenta text-[#ffd9ec]">C 5 M 100<br/>Y 30 K 0</motion.div>
         <motion.div animate={{ rotate: 6, x: 20 }} transition={{ duration: 1.4 }} className="swatch sw3 bg-brand-cyan text-[#d7f2ff]">C 100 M 5<br/>Y 0 K 5</motion.div>
         <motion.div animate={{ rotate: -5, x: 60 }} transition={{ duration: 1.6 }} className="swatch sw4 bg-brand-teal text-[#d9f0e7]">C 85 M 20<br/>Y 60 K 15</motion.div>
@@ -322,31 +323,28 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
       <motion.div style={{ y, opacity }}>
         <FadeUp>
           <div className="mb-[26px] flex items-center gap-2.5">
-            <span className="rounded-[20px] border border-border bg-[#0b6e4f0f] px-3 py-1.5 text-[11.5px] font-semibold tracking-[1.5px] text-brand-teal">
+            <span className="rounded-[20px] border border-border bg-[#0078D40f] px-3 py-1.5 text-[11.5px] font-semibold tracking-[1.5px] text-brand-teal">
               SURAT, INDIA
             </span>
-            <span className="text-[12.5px] tracking-[0.5px] text-[#8a857d]">
+            <span className="text-[12.5px] tracking-[0.5px] text-[#8C94A3]">
               Studio est. 2014 — 10+ years in print
             </span>
           </div>
         </FadeUp>
 
         <FadeUp delay={0.1}>
-          <h1 className="font-display text-[12vw] leading-[0.98] tracking-[-1px] md:max-w-[840px] md:text-[76px]">
-            <span className="text-brand-ink">Your brand's</span><br />
-            <span className="misreg">
-              <span className="layer c">FIRST IMPRESSION</span>
-              <span className="layer m">FIRST IMPRESSION</span>
-              <span className="layer y">FIRST IMPRESSION</span>
-              <span className="base">FIRST IMPRESSION</span>
-            </span><br />
-            <span className="text-brand-ink">starts here.</span>
+          <h1 className="font-hero text-[14vw] font-bold leading-[0.95] tracking-tight md:max-w-[840px] md:text-[110px] uppercase flex flex-col items-start text-brand-ink">
+            <span>YOUR</span>
+            <span className="text-brand-yellow italic -mt-2">BRAND'S</span>
+            <span className="-mt-2">FIRST IMPRESSION</span>
+            <span className="-mt-2">STARTS HERE.</span>
           </h1>
         </FadeUp>
 
         <FadeUp delay={0.2}>
-          <p className="mt-7 max-w-[480px] text-[17px] leading-[1.6] text-[#5c5750]">
-            Graphic design and printing, done right the first time — from logo to letterhead, packaging to hoarding.
+          <div className="mt-8 mb-4 h-[1px] w-[200px] bg-brand-yellow" />
+          <p className="max-w-[480px] text-[17px] leading-[1.6] text-[#5A6478]">
+            All Type of Graphic Designing & Printing — Since 2014
           </p>
         </FadeUp>
 
@@ -362,8 +360,8 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
         </FadeUp>
 
         <FadeUp delay={0.4}>
-          <div className="mt-12 h-[3px] w-12 bg-brand-magenta" />
-          <div className="mt-4 text-[14px] text-[#8a857d]">
+          <div className="mt-12 h-[3px] w-12 bg-brand-cyan" />
+          <div className="mt-4 text-[14px] text-[#8C94A3]">
             Trusted by <b className="font-semibold text-brand-ink">120+ local businesses</b> across Surat since 2014.
           </div>
         </FadeUp>
@@ -377,8 +375,8 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
         className="absolute bottom-6 left-1/2 -translate-x-1/2"
       >
         <div className="scroll-indicator flex flex-col items-center gap-2">
-          <span className="text-[11px] font-semibold tracking-[2px] text-[#8a857d]">SCROLL</span>
-          <ArrowDown className="h-4 w-4 text-[#8a857d]" />
+          <span className="text-[11px] font-semibold tracking-[2px] text-[#8C94A3]">SCROLL</span>
+          <ArrowDown className="h-4 w-4 text-[#8C94A3]" />
         </div>
       </motion.div>
     </section>
@@ -433,7 +431,7 @@ function About() {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 1 }}
         className="pointer-events-none absolute right-6 top-10 z-0 select-none font-display text-[150px] leading-none text-brand-paper2 md:text-[200px]"
       >
@@ -443,7 +441,7 @@ function About() {
       <div className="relative z-10">
         <FadeUp>
           <div className="mb-4 flex items-center gap-2">
-            <span className="h-[2px] w-[26px] bg-brand-magenta" />
+            <span className="h-[2px] w-[26px] bg-brand-cyan" />
             <span className="text-[12px] font-semibold tracking-[2px] text-brand-teal">
               OUR STORY
             </span>
@@ -464,7 +462,7 @@ function About() {
 
         <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <div className="mb-8 space-y-5 text-[16px] leading-[1.75] text-[#524d46]">
+            <div className="mb-8 space-y-5 text-[16px] leading-[1.75] text-[#5A6478]">
               {content.aboutText.map((t, i) => (
                 <FadeUp key={i} delay={0.2 + i * 0.1}>
                   <p>{t}</p>
@@ -477,19 +475,19 @@ function About() {
               <FadeUp delay={0.4}>
                 <div className="stat-pill flex items-baseline gap-2 rounded-[40px] bg-brand-ink px-[22px] py-[14px] text-brand-paper">
                   <AnimatedCounter to={10} className="font-display text-[19px] text-brand-magenta" />
-                  <span className="text-[11px] font-semibold tracking-[1.5px] text-[#cfc9bd]">YEARS</span>
+                  <span className="text-[11px] font-semibold tracking-[1.5px] text-[#B8C1D0]">YEARS</span>
                 </div>
               </FadeUp>
               <FadeUp delay={0.5}>
                 <div className="stat-pill flex items-baseline gap-2 rounded-[40px] bg-brand-ink px-[22px] py-[14px] text-brand-paper">
                   <AnimatedCounter to={500} className="font-display text-[19px] text-brand-cyan" />
-                  <span className="text-[11px] font-semibold tracking-[1.5px] text-[#cfc9bd]">CLIENTS</span>
+                  <span className="text-[11px] font-semibold tracking-[1.5px] text-[#B8C1D0]">CLIENTS</span>
                 </div>
               </FadeUp>
               <FadeUp delay={0.6}>
                 <div className="stat-pill flex items-baseline gap-2 rounded-[40px] bg-brand-ink px-[22px] py-[14px] text-brand-paper">
                   <AnimatedCounter to={1000} className="font-display text-[19px] text-brand-yellow" />
-                  <span className="text-[11px] font-semibold tracking-[1.5px] text-[#cfc9bd]">PROJECTS</span>
+                  <span className="text-[11px] font-semibold tracking-[1.5px] text-[#B8C1D0]">PROJECTS</span>
                 </div>
               </FadeUp>
             </div>
@@ -501,17 +499,17 @@ function About() {
               <div
                 className="absolute inset-x-0 top-0 h-[5px]"
                 style={{
-                  background: "linear-gradient(90deg, var(--color-brand-magenta), var(--color-brand-yellow) 50%, var(--color-brand-cyan))",
+                  background: "linear-gradient(90deg, var(--color-brand-cyan), var(--color-brand-magenta) 50%, var(--color-brand-yellow))",
                 }}
               />
               <div className="absolute bottom-5 right-5 h-5 w-5 opacity-55">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#a8a29a" strokeWidth="1"/><line x1="12" y1="1" x2="12" y2="23" stroke="#a8a29a" strokeWidth="1"/><line x1="1" y1="12" x2="23" y2="12" stroke="#a8a29a" strokeWidth="1"/></svg>
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#9CA3B0" strokeWidth="1"/><line x1="12" y1="1" x2="12" y2="23" stroke="#9CA3B0" strokeWidth="1"/><line x1="1" y1="12" x2="23" y2="12" stroke="#9CA3B0" strokeWidth="1"/></svg>
               </div>
               
               <motion.div
                 initial={{ scale: 0, rotate: -20 }}
                 whileInView={{ scale: 1, rotate: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: false }}
                 transition={{ type: "spring", stiffness: 200, damping: 15 }}
                 className="mb-2 font-italic-display text-[52px] leading-[0.6] text-brand-yellow"
               >
@@ -522,7 +520,7 @@ function About() {
               </div>
               <div className="flex items-center gap-2.5">
                 <div className="h-[2px] w-[22px] bg-brand-cyan" />
-                <span className="text-[11.5px] font-semibold tracking-[2px] text-[#a8a29a]">
+                <span className="text-[11.5px] font-semibold tracking-[2px] text-[#9CA3B0]">
                   GURU GRAPHICS, SURAT
                 </span>
               </div>
@@ -549,33 +547,38 @@ function About() {
 function AnimatedCounter({ to, className }: { to: number; className?: string }) {
   const [val, setVal] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
-  const [hasAnimated, setHasAnimated] = useState(false);
   
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    let rafId: number;
     const io = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
+        if (entries[0].isIntersecting) {
           const start = performance.now();
           const dur = 1800;
           const tick = (now: number) => {
             const p = Math.min(1, (now - start) / dur);
-            // Ease out cubic
             const eased = 1 - Math.pow(1 - p, 3);
             setVal(Math.floor(to * eased));
-            if (p < 1) requestAnimationFrame(tick);
+            if (p < 1) {
+              rafId = requestAnimationFrame(tick);
+            }
           };
-          requestAnimationFrame(tick);
-          io.disconnect();
+          rafId = requestAnimationFrame(tick);
+        } else {
+          cancelAnimationFrame(rafId);
+          setVal(0);
         }
       },
       { threshold: 0.4 },
     );
     io.observe(el);
-    return () => io.disconnect();
-  }, [to, hasAnimated]);
+    return () => {
+      cancelAnimationFrame(rafId);
+      io.disconnect();
+    };
+  }, [to]);
   
   return <span ref={ref} className={className}>{val}+</span>;
 }
@@ -601,7 +604,7 @@ function Services({ onNav }: { onNav: (id: string) => void }) {
       <div className="mx-auto max-w-7xl px-6 md:px-16">
         <FadeUp>
           <div className="mb-4 flex items-center gap-2 text-[12px] font-semibold tracking-[2px] text-brand-teal">
-            <span className="h-[2px] w-[26px] bg-brand-magenta" /> DO YOU NEED A PROFESSIONAL
+            <span className="h-[2px] w-[26px] bg-brand-cyan" /> DO YOU NEED A PROFESSIONAL
           </div>
         </FadeUp>
         <FadeUp delay={0.1}>
@@ -651,10 +654,10 @@ function Services({ onNav }: { onNav: (id: string) => void }) {
                   <div className="text-[16px] font-semibold text-brand-ink">
                     {s.name}
                   </div>
-                  <div className="mt-1.5 text-[12px] font-medium tracking-[1px] text-[#8a857d]">
+                  <div className="mt-1.5 text-[12px] font-medium tracking-[1px] text-[#8C94A3]">
                     {s.category.toUpperCase()}
                   </div>
-                  <ArrowUpRight className="absolute right-4 top-4 h-4 w-4 text-[#cfc9bd] transition-all group-hover:text-brand-magenta" />
+                  <ArrowUpRight className="absolute right-4 top-4 h-4 w-4 text-[#B8C1D0] transition-all group-hover:text-brand-magenta" />
                 </motion.button>
               );
             })}
@@ -662,7 +665,7 @@ function Services({ onNav }: { onNav: (id: string) => void }) {
         </motion.div>
 
         <FadeUp>
-          <p className="mt-14 text-center font-italic-display text-[28px] text-[#8a857d]">
+          <p className="mt-14 text-center font-italic-display text-[28px] text-[#8C94A3]">
             One studio. Every print. Endless possibilities.
           </p>
         </FadeUp>
@@ -681,7 +684,7 @@ function Clients() {
       <div className="mx-auto max-w-7xl px-6 md:px-16">
         <FadeUp>
           <div className="mb-4 flex items-center gap-2 text-[12px] font-semibold tracking-[2px] text-brand-teal">
-            <span className="h-[2px] w-[26px] bg-brand-magenta" /> TRUSTED BY
+            <span className="h-[2px] w-[26px] bg-brand-cyan" /> TRUSTED BY
           </div>
         </FadeUp>
         <div className="flex flex-wrap items-end justify-between gap-6">
@@ -691,7 +694,7 @@ function Clients() {
             </h2>
           </FadeUp>
           <FadeUp delay={0.2}>
-            <p className="max-w-[400px] text-[16px] leading-[1.75] text-[#524d46]">
+            <p className="max-w-[400px] text-[16px] leading-[1.75] text-[#5A6478]">
               {clients.length}+ brands have trusted us since 2014 — from neighbourhood shops
               to national labels.
             </p>
@@ -719,7 +722,7 @@ function Marquee({ items, reverse }: { items: string[]; reverse?: boolean }) {
         {doubled.map((name, i) => (
           <div
             key={i}
-            className="client-card grid h-[80px] w-[220px] shrink-0 place-items-center rounded-[4px] border border-brand-ink bg-brand-paper2 px-6 shadow-[4px_4px_0_0_var(--color-brand-ink)]"
+            className="client-card grid h-[80px] w-[220px] shrink-0 place-items-center rounded-[8px] border border-[#E2E8F0] bg-white px-6 shadow-[0_2px_8px_rgba(27,42,74,0.06)]"
           >
             <span className="text-center font-display text-[15px] tracking-[1px] text-brand-ink">
               {name.toUpperCase()}
@@ -775,7 +778,7 @@ function Contact() {
       <div className="mx-auto max-w-7xl px-6 md:px-16">
         <FadeUp>
           <div className="mb-4 flex items-center gap-2 text-[12px] font-semibold tracking-[2px] text-brand-teal">
-            <span className="h-[2px] w-[26px] bg-brand-magenta" /> GET IN TOUCH
+            <span className="h-[2px] w-[26px] bg-brand-cyan" /> GET IN TOUCH
           </div>
         </FadeUp>
         <FadeUp delay={0.1}>
@@ -793,13 +796,13 @@ function Contact() {
               href={waLink}
               target="_blank"
               rel="noreferrer"
-              className="group flex items-center justify-between rounded-[4px] border-2 border-brand-ink bg-brand-yellow p-6 shadow-[6px_6px_0_0_var(--color-brand-ink)] transition-all duration-300 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[4px_4px_0_0_var(--color-brand-ink)]"
+              className="group flex items-center justify-between rounded-[8px] bg-[#E8F4FD] p-6 shadow-[0_4px_16px_rgba(0,120,212,0.12)] transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,120,212,0.18)]"
             >
               <div className="flex items-center gap-5">
                 <motion.span
                   whileHover={{ rotate: [0, -10, 10, -10, 0] }}
                   transition={{ duration: 0.5 }}
-                  className="grid h-[52px] w-[52px] place-items-center rounded-full border-2 border-brand-ink bg-brand-paper"
+                  className="grid h-[52px] w-[52px] place-items-center rounded-full bg-brand-paper"
                 >
                   <MessageCircle className="h-6 w-6 text-brand-ink" />
                 </motion.span>
@@ -826,13 +829,13 @@ function Contact() {
             ref={formRef}
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: false }}
             transition={{ duration: 0.7 }}
             onSubmit={handleSubmit}
-            className="relative overflow-hidden rounded-[8px] border border-border bg-brand-paper p-8 shadow-[0_10px_40px_rgba(21,19,18,0.06)] md:p-10"
+            className="relative overflow-hidden rounded-[8px] border border-border bg-white p-8 shadow-[0_10px_40px_rgba(27,42,74,0.06)] md:p-10"
           >
             <h3 className="font-display text-[32px] text-brand-ink">SEND US A MESSAGE</h3>
-            <p className="mt-2 text-[15px] text-[#8a857d]">
+            <p className="mt-2 text-[15px] text-[#8C94A3]">
               We typically respond within 24 hours.
             </p>
 
@@ -842,7 +845,7 @@ function Contact() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="mt-6 rounded border border-[#0B6E4F] bg-[#0b6e4f0f] px-5 py-4 text-[14.5px] font-medium text-brand-teal"
+                  className="mt-6 rounded border border-[#0B6E4F] bg-[#0078D40f] px-5 py-4 text-[14.5px] font-medium text-brand-teal"
                 >
                   ✓ Thank you! Your enquiry has been received. We'll be in touch shortly.
                   <ConfettiBurst />
@@ -927,7 +930,7 @@ function InfoCard({ icon, label, value }: { icon: React.ReactNode; label: string
       >
         {icon}
       </motion.div>
-      <div className="mb-1.5 text-[11px] font-semibold tracking-[2px] text-[#8a857d]">
+      <div className="mb-1.5 text-[11px] font-semibold tracking-[2px] text-[#8C94A3]">
         {label}
       </div>
       <div className="text-[14.5px] font-semibold text-brand-ink">{value}</div>
@@ -981,7 +984,7 @@ function SelectField({ label, name, options }: { label: string; name: string; op
 
   return (
     <div className="relative block" ref={ref}>
-      <span className="text-[12px] font-semibold tracking-[0.5px] text-[#8a857d]">{label}</span>
+      <span className="text-[12px] font-semibold tracking-[0.5px] text-[#8C94A3]">{label}</span>
       <input type="hidden" name={name} value={selected} />
 
       <button
@@ -989,10 +992,10 @@ function SelectField({ label, name, options }: { label: string; name: string; op
         onClick={() => setOpen(!open)}
         className="mt-2 flex w-full items-center justify-between rounded-[3px] border-[1.5px] border-border bg-brand-paper2 px-4 py-3 text-left text-[14.5px] font-medium text-brand-ink outline-none transition-all focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(214,0,111,0.08)]"
       >
-        <span className={selected ? "text-brand-ink" : "text-[#8a857d]"}>
+        <span className={selected ? "text-brand-ink" : "text-[#8C94A3]"}>
           {selected || "Select a service..."}
         </span>
-        <ChevronDown className={`h-4 w-4 text-[#8a857d] transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-4 w-4 text-[#8C94A3] transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
 
       <AnimatePresence>
@@ -1042,7 +1045,7 @@ function Footer({ onNav }: { onNav: (id: string) => void }) {
           <p className="font-italic-display mt-6 text-[22px] leading-snug text-brand-ink">
             "{content.tagline}"
           </p>
-          <p className="mt-4 max-w-xs text-[14.5px] text-[#8a857d]">
+          <p className="mt-4 max-w-xs text-[14.5px] text-[#8C94A3]">
             Premium printing &amp; graphic design from Surat, India — since 2014.
           </p>
         </div>
@@ -1068,7 +1071,7 @@ function Footer({ onNav }: { onNav: (id: string) => void }) {
           <ul className="mt-5 space-y-3 text-[14.5px] font-medium text-brand-ink">
             <li>{contact.phone}</li>
             <li>{contact.email}</li>
-            <li className="text-[#8a857d]">{contact.address}</li>
+            <li className="text-[#8C94A3]">{contact.address}</li>
           </ul>
           <div className="mt-6 flex gap-3">
             <a
@@ -1095,7 +1098,7 @@ function Footer({ onNav }: { onNav: (id: string) => void }) {
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 0.05 }}
-          viewport={{ once: true }}
+          viewport={{ once: false }}
           transition={{ duration: 1 }}
           className="whitespace-nowrap font-display text-[14vw] leading-none text-brand-ink"
         >
@@ -1103,7 +1106,7 @@ function Footer({ onNav }: { onNav: (id: string) => void }) {
         </motion.div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 text-center text-[12px] font-medium text-[#8a857d] md:px-16 mt-4">
+      <div className="mx-auto max-w-7xl px-6 text-center text-[12px] font-medium text-[#8C94A3] md:px-16 mt-4">
         &copy; {new Date().getFullYear()} Guru Graphics &middot; Designed with care.
       </div>
     </footer>
@@ -1116,7 +1119,7 @@ function FadeUp({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
+      viewport={{ once: false, margin: "-80px" }}
       transition={{ duration: 0.7, delay, ease: "easeOut" }}
     >
       {children}
@@ -1136,10 +1139,53 @@ function BackToTop() {
       initial={false}
       animate={{ opacity: show ? 1 : 0, scale: show ? 1 : 0.5 }}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed bottom-24 right-6 z-40 grid h-12 w-12 place-items-center rounded-full border-2 border-brand-ink bg-brand-cyan text-brand-ink shadow-lg transition-transform hover:scale-110 md:bottom-28 md:right-10"
+      className="fixed bottom-24 right-6 z-40 grid h-12 w-12 place-items-center rounded-full bg-brand-cyan text-brand-ink shadow-lg transition-transform hover:scale-110 md:bottom-28 md:right-10"
       aria-label="Back to top"
     >
       <ArrowUp className="h-5 w-5" />
     </motion.button>
+  );
+}
+
+function CustomCursor() {
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const [isInteractive, setIsInteractive] = useState(false);
+
+  useEffect(() => {
+    // Only run on non-touch devices
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (cursorRef.current) {
+        cursorRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
+      }
+    };
+    
+    const onMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('a, button, input, textarea, select, [role="button"], label')) {
+        setIsInteractive(true);
+      } else {
+        setIsInteractive(false);
+      }
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseover", onMouseOver);
+    
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseover", onMouseOver);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={cursorRef}
+      className={`pointer-events-none fixed left-0 top-0 z-[100000] hidden rounded-full bg-brand-cyan transition-[width,height,opacity,background-color] duration-300 ease-out md:block mix-blend-multiply ${
+        isInteractive ? "h-12 w-12 bg-opacity-20 backdrop-blur-[2px]" : "h-5 w-5 bg-opacity-100 shadow-[0_0_15px_rgba(0,120,212,0.6)]"
+      }`}
+      style={{ transform: "translate(-50%, -50%)", willChange: "transform" }}
+    />
   );
 }
