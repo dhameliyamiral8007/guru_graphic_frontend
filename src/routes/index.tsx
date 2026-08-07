@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import { useEffect, useRef, useState, useMemo } from "react";
 import {
   ArrowUpRight,
   ArrowDown,
@@ -11,11 +11,29 @@ import {
   MapPin,
   MessageCircle,
   ChevronDown,
+  Printer,
+  PenTool,
+  Palette,
+  FileText,
+  Image,
+  Box,
+  Tag,
+  LayoutGrid,
+  Megaphone,
+  Layers,
+  StickyNote,
+  BookOpen,
+  CreditCard,
+  PanelTop,
+  Share2,
+  Stamp,
+  Sparkles,
+  MousePointer,
 } from "lucide-react";
 import guruLogo from "../assets/gurulogo.png";
 import { useStore } from "../store/useStore";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/")(  {
   head: () => ({
     meta: [
       { title: "Guru Graphics — Graphic Design & Printing in Surat" },
@@ -43,6 +61,30 @@ const NAV = [
   { label: "Clients", id: "clients" },
   { label: "Contact", id: "contact" },
 ];
+
+/* ═══════════════════ SERVICE ICON MAP ═══════════════════ */
+const SERVICE_ICONS: Record<string, React.ElementType> = {
+  "Stationery Works": FileText,
+  "Business Card": CreditCard,
+  "Rough Pad": StickyNote,
+  "Acrylic Board": PanelTop,
+  "Catalogue": BookOpen,
+  "Review Card": MessageCircle,
+  "Doctor File": FileText,
+  "Hoarding": Megaphone,
+  "Brochure": BookOpen,
+  "Label / Sticker": Tag,
+  "Letter Head": FileText,
+  "Banner / Eco Vinyl": Image,
+  "Logo Design": PenTool,
+  "Product Packaging Box": Box,
+  "Flyer": Layers,
+  "Social Media Post": Share2,
+  "Visiting Cards": CreditCard,
+  "Flex Banners": Image,
+  "Offset Printing": Printer,
+  "Digital Printing": Printer,
+};
 
 function Home() {
   const [active, setActive] = useState("home");
@@ -89,11 +131,11 @@ function Home() {
   };
 
   return (
-    <div className="relative min-h-screen text-foreground">
+    <div className="relative min-h-screen">
+      <ScrollProgress />
       <Header active={active} onNav={scrollTo} />
       <Hero onNav={scrollTo} />
       <About />
-      <Stats />
       <Services onNav={scrollTo} />
       <Clients />
       <Contact />
@@ -105,7 +147,7 @@ function Home() {
         href={`https://wa.me/${useStore.getState().contact?.whatsapp?.replace(/\D/g, "")}?text=Hi%20Guru%20Graphics!`}
         target="_blank"
         rel="noreferrer"
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-emerald-500/30 transition-transform hover:scale-110 md:bottom-10 md:right-10"
+        className="whatsapp-float fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-110 md:bottom-10 md:right-10"
         aria-label="WhatsApp Us"
       >
         <MessageCircle className="h-7 w-7" />
@@ -114,45 +156,57 @@ function Home() {
   );
 }
 
-/* ---------------- Header ---------------- */
+/* ═══════════════════ SCROLL PROGRESS ═══════════════════ */
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+  return <motion.div className="scroll-progress" style={{ scaleX }} />;
+}
+
+/* ═══════════════════ HEADER ═══════════════════ */
 function Header({ active, onNav }: { active: string; onNav: (id: string) => void }) {
   const [open, setOpen] = useState(false);
-  const contact = useStore((s) => s.contact);
-  const waLink = `https://wa.me/${contact.whatsapp.replace(/\D/g, "")}?text=Hi%20Guru%20Graphics!`;
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <motion.header
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="fixed inset-x-0 top-0 z-50 border-b border-border/70 bg-background/80 backdrop-blur-md"
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "border-b border-border bg-brand-paper/95 shadow-[0_1px_20px_rgba(21,19,18,0.06)] backdrop-blur-md"
+          : "border-b border-transparent bg-brand-paper"
+      }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 md:px-8 md:py-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-14">
         <button
           onClick={() => onNav("home")}
-          className="flex shrink-0 items-center gap-3"
+          className="flex shrink-0 items-center gap-3 transition-transform hover:scale-105"
           aria-label="Home"
         >
           <Logo />
         </button>
 
-        <div className="flex items-center gap-2 md:gap-6">
-          <nav className="hidden items-center gap-4 lg:flex">
+        <div className="flex items-center gap-2 md:gap-8">
+          <nav className="hidden items-center gap-8 lg:flex">
             {NAV.map((n) => (
               <button
                 key={n.id}
                 onClick={() => onNav(n.id)}
-                className="group relative px-2 py-2 text-[15px] font-medium text-primary transition-colors"
+                className="group relative text-[14.5px] font-medium text-brand-ink transition-colors hover:text-brand-magenta"
               >
-                <span
-                  className={
-                    active === n.id ? "text-brand-blue" : "group-hover:text-brand-blue"
-                  }
-                >
+                <span className={active === n.id ? "text-brand-magenta" : ""}>
                   {n.label}
                 </span>
                 <span
-                  className={`absolute inset-x-2 -bottom-0.5 h-0.5 origin-left bg-brand-blue transition-transform duration-300 ${
+                  className={`absolute inset-x-0 -bottom-1 h-[2px] origin-left bg-brand-magenta transition-transform duration-300 ${
                     active === n.id ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                   }`}
                 />
@@ -161,42 +215,60 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
           </nav>
 
           <button
+            onClick={() => onNav("contact")}
+            className="btn-primary hidden lg:block"
+          >
+            Get a quote
+          </button>
+
+          <button
             onClick={() => setOpen((o) => !o)}
             className="grid h-10 w-10 place-items-center rounded-md border border-border lg:hidden"
             aria-label="Menu"
           >
             <div className="flex flex-col gap-1.5">
-              <span className={`h-0.5 w-5 bg-primary transition ${open ? "translate-y-2 rotate-45" : ""}`} />
-              <span className={`h-0.5 w-5 bg-primary transition ${open ? "opacity-0" : ""}`} />
-              <span className={`h-0.5 w-5 bg-primary transition ${open ? "-translate-y-2 -rotate-45" : ""}`} />
+              <span className={`h-0.5 w-5 bg-brand-ink transition-all duration-300 ${open ? "translate-y-2 rotate-45" : ""}`} />
+              <span className={`h-0.5 w-5 bg-brand-ink transition-all duration-300 ${open ? "opacity-0" : ""}`} />
+              <span className={`h-0.5 w-5 bg-brand-ink transition-all duration-300 ${open ? "-translate-y-2 -rotate-45" : ""}`} />
             </div>
           </button>
         </div>
       </div>
 
-      {open && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          className="overflow-hidden border-t border-border bg-background lg:hidden"
-        >
-          <div className="flex flex-col p-4">
-            {NAV.map((n) => (
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden border-t border-border bg-brand-paper lg:hidden"
+          >
+            <div className="flex flex-col p-4">
+              {NAV.map((n) => (
+                <button
+                  key={n.id}
+                  onClick={() => {
+                    onNav(n.id);
+                    setOpen(false);
+                  }}
+                  className="border-b border-border/60 py-4 text-left text-lg font-medium text-brand-ink transition-colors hover:text-brand-magenta"
+                >
+                  {n.label}
+                </button>
+              ))}
               <button
-                key={n.id}
                 onClick={() => {
-                  onNav(n.id);
+                  onNav("contact");
                   setOpen(false);
                 }}
-                className="border-b border-border/60 py-3 text-left text-lg font-medium text-primary"
+                className="btn-primary mt-4 py-3 text-center"
               >
-                {n.label}
+                Get a quote
               </button>
-            ))}
-            {/* Mobile menu items */}
-          </div>
-        </motion.div>
-      )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }
@@ -204,12 +276,12 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
 function Logo() {
   return (
     <div className="flex items-center">
-      <img src={guruLogo} alt="Guru Graphics Logo" className="h-10 w-auto" />
+      <img src={guruLogo} alt="Guru Graphics" className="h-[48px] w-auto" />
     </div>
   );
 }
 
-/* ---------------- Hero ---------------- */
+/* ═══════════════════ HERO ═══════════════════ */
 function Hero({ onNav }: { onNav: (id: string) => void }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -220,251 +292,279 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
     <section
       id="home"
       ref={ref}
-      className="relative flex min-h-screen items-center pt-24"
+      className="relative mx-auto max-w-7xl overflow-hidden px-6 pb-[90px] pt-[150px] md:px-14"
     >
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Background Glowing Orbs */}
-        <motion.div
-          animate={{ y: [-10, 10, -10], rotate: [0, 5, -5, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute left-[10%] top-[20%] h-32 w-32 rounded-full bg-brand-blue/5 blur-3xl md:h-64 md:w-64 md:bg-brand-blue/10"
-        />
-        <motion.div
-          animate={{ y: [10, -10, 10], rotate: [0, -5, 5, 0] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-[10%] right-[15%] h-40 w-40 rounded-full bg-brand-magenta/5 blur-3xl md:h-80 md:w-80 md:bg-brand-magenta/10"
-        />
+      {/* Parallax floating shapes */}
+      <FloatingShapes />
 
-        {/* decorative sweeping arc */}
-        <motion.svg
-          className="absolute right-0 top-1/4 h-[700px] w-[700px] opacity-20 md:opacity-40"
-          viewBox="0 0 700 700"
-          initial={{ rotate: -10, opacity: 0 }}
-          animate={{ rotate: 0, opacity: 0.4 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-        >
-          <motion.path
-            d="M50,500 Q350,100 650,400"
-            stroke="var(--color-brand-yellow)"
-            strokeWidth="60"
-            fill="none"
-            strokeLinecap="round"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 2, ease: "easeInOut" }}
-          />
-          <motion.path
-            d="M100,550 Q400,150 700,450"
-            stroke="var(--color-brand-blue)"
-            strokeWidth="30"
-            fill="none"
-            strokeLinecap="round"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 2.2, ease: "easeInOut", delay: 0.2 }}
-          />
-        </motion.svg>
+      {/* Registration marks */}
+      <div className="regmark rm-tl absolute left-6 top-8 hidden md:block">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--color-brand-ink)" strokeWidth="1"/><line x1="12" y1="1" x2="12" y2="23" stroke="var(--color-brand-ink)" strokeWidth="1"/><line x1="1" y1="12" x2="23" y2="12" stroke="var(--color-brand-ink)" strokeWidth="1"/></svg>
+      </div>
+      <div className="regmark rm-tr absolute right-6 top-8 hidden md:block">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--color-brand-ink)" strokeWidth="1"/><line x1="12" y1="1" x2="12" y2="23" stroke="var(--color-brand-ink)" strokeWidth="1"/><line x1="1" y1="12" x2="23" y2="12" stroke="var(--color-brand-ink)" strokeWidth="1"/></svg>
+      </div>
+      <div className="regmark rm-bl absolute bottom-8 left-6 hidden md:block">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--color-brand-ink)" strokeWidth="1"/><line x1="12" y1="1" x2="12" y2="23" stroke="var(--color-brand-ink)" strokeWidth="1"/><line x1="1" y1="12" x2="23" y2="12" stroke="var(--color-brand-ink)" strokeWidth="1"/></svg>
+      </div>
+      <div className="regmark rm-br absolute bottom-8 right-6 hidden md:block">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--color-brand-ink)" strokeWidth="1"/><line x1="12" y1="1" x2="12" y2="23" stroke="var(--color-brand-ink)" strokeWidth="1"/><line x1="1" y1="12" x2="23" y2="12" stroke="var(--color-brand-ink)" strokeWidth="1"/></svg>
       </div>
 
-      <span className="absolute left-4 top-1/2 hidden -translate-y-1/2 -rotate-90 text-xs font-semibold tracking-[0.4em] text-muted-foreground md:block">
-        SURAT, INDIA — EST. 2014
-      </span>
-      <span className="absolute right-4 bottom-8 hidden -rotate-90 text-xs font-semibold tracking-[0.4em] text-muted-foreground md:block">
-        SCROLL ↓
-      </span>
+      {/* CMYK Swatches */}
+      <div className="absolute right-14 top-[150px] hidden flex-col gap-2.5 lg:flex">
+        <motion.div animate={{ rotate: 4, x: 30 }} transition={{ duration: 1 }} className="swatch sw1 bg-brand-yellow text-[#5c4400]">C 0 M 20<br/>Y 100 K 0</motion.div>
+        <motion.div animate={{ rotate: -3, x: 70 }} transition={{ duration: 1.2 }} className="swatch sw2 bg-brand-magenta text-[#ffd9ec]">C 5 M 100<br/>Y 30 K 0</motion.div>
+        <motion.div animate={{ rotate: 6, x: 20 }} transition={{ duration: 1.4 }} className="swatch sw3 bg-brand-cyan text-[#d7f2ff]">C 100 M 5<br/>Y 0 K 5</motion.div>
+        <motion.div animate={{ rotate: -5, x: 60 }} transition={{ duration: 1.6 }} className="swatch sw4 bg-brand-teal text-[#d9f0e7]">C 85 M 20<br/>Y 60 K 15</motion.div>
+      </div>
 
-      <motion.div style={{ y, opacity }} className="mx-auto w-full max-w-7xl px-6 md:px-16">
-        <div className="max-w-4xl">
-          <motion.h1
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
-            }}
-            className="text-display text-[15vw] text-primary md:text-[9vw]"
-          >
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 40 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
-              }}
-            >
-              YOUR
-            </motion.div>
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, x: -60, skewX: -10 },
-                visible: { opacity: 1, x: 0, skewX: -8, transition: { duration: 0.9, ease: "easeOut" } },
-              }}
-              className="text-italic-display font-bold text-brand-blue"
-              style={{ transform: "skewX(-8deg)" }}
-            >
-              Brand's
-            </motion.div>
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
-              }}
-            >
-              FIRST IMPRESSION
-            </motion.div>
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
-              }}
-            >
-              STARTS HERE.
-            </motion.div>
-          </motion.h1>
+      <motion.div style={{ y, opacity }}>
+        <FadeUp>
+          <div className="mb-[26px] flex items-center gap-2.5">
+            <span className="rounded-[20px] border border-border bg-[#0b6e4f0f] px-3 py-1.5 text-[11.5px] font-semibold tracking-[1.5px] text-brand-teal">
+              SURAT, INDIA
+            </span>
+            <span className="text-[12.5px] tracking-[0.5px] text-[#8a857d]">
+              Studio est. 2014 — 10+ years in print
+            </span>
+          </div>
+        </FadeUp>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="mt-10"
-          >
-            <div className="h-0.5 w-24 bg-brand-blue" />
-            <p className="mt-4 text-base text-muted-foreground md:text-lg">
-              {useStore((s) => s.content.heroSubtitle)}
-            </p>
-            <div className="mt-8 flex flex-wrap gap-5">
-              <button
-                onClick={() => onNav("services")}
-                className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full border border-primary bg-transparent px-7 py-3.5 text-sm font-semibold text-primary transition-all hover:text-white"
-              >
-                <span className="absolute inset-0 -translate-x-full bg-primary transition-transform duration-300 ease-out group-hover:translate-x-0" />
-                <span className="relative z-10 flex items-center gap-3">
-                  See Our Work
-                  <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-1" />
-                </span>
-              </button>
-              <button
-                onClick={() => onNav("contact")}
-                className="group relative inline-flex items-center gap-3 rounded-full bg-brand-blue px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-blue/30 transition-all hover:-translate-y-1 hover:shadow-brand-blue/40"
-              >
-                Contact Us
-                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </button>
-            </div>
-          </motion.div>
+        <FadeUp delay={0.1}>
+          <h1 className="font-display text-[12vw] leading-[0.98] tracking-[-1px] md:max-w-[840px] md:text-[76px]">
+            <span className="text-brand-ink">Your brand's</span><br />
+            <span className="misreg">
+              <span className="layer c">FIRST IMPRESSION</span>
+              <span className="layer m">FIRST IMPRESSION</span>
+              <span className="layer y">FIRST IMPRESSION</span>
+              <span className="base">FIRST IMPRESSION</span>
+            </span><br />
+            <span className="text-brand-ink">starts here.</span>
+          </h1>
+        </FadeUp>
+
+        <FadeUp delay={0.2}>
+          <p className="mt-7 max-w-[480px] text-[17px] leading-[1.6] text-[#5c5750]">
+            Graphic design and printing, done right the first time — from logo to letterhead, packaging to hoarding.
+          </p>
+        </FadeUp>
+
+        <FadeUp delay={0.3}>
+          <div className="mt-[38px] flex flex-wrap items-center gap-[22px]">
+            <button onClick={() => onNav("contact")} className="btn-primary">
+              <span>Start a project</span>
+            </button>
+            <button onClick={() => onNav("services")} className="btn-secondary">
+              <span>See our work</span>
+            </button>
+          </div>
+        </FadeUp>
+
+        <FadeUp delay={0.4}>
+          <div className="mt-12 h-[3px] w-12 bg-brand-magenta" />
+          <div className="mt-4 text-[14px] text-[#8a857d]">
+            Trusted by <b className="font-semibold text-brand-ink">120+ local businesses</b> across Surat since 2014.
+          </div>
+        </FadeUp>
+      </motion.div>
+
+      {/* Scroll Indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5, duration: 0.5 }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2"
+      >
+        <div className="scroll-indicator flex flex-col items-center gap-2">
+          <span className="text-[11px] font-semibold tracking-[2px] text-[#8a857d]">SCROLL</span>
+          <ArrowDown className="h-4 w-4 text-[#8a857d]" />
         </div>
       </motion.div>
     </section>
   );
 }
 
-/* ---------------- About ---------------- */
+/* ═══════════════════ FLOATING SHAPES ═══════════════════ */
+function FloatingShapes() {
+  const shapes = useMemo(() => [
+    { size: 120, x: "10%", y: "20%", color: "var(--magenta)", delay: 0 },
+    { size: 80, x: "75%", y: "60%", color: "var(--cyan)", delay: 0.5 },
+    { size: 60, x: "85%", y: "15%", color: "var(--yellow)", delay: 1 },
+    { size: 100, x: "20%", y: "75%", color: "var(--teal)", delay: 1.5 },
+    { size: 40, x: "55%", y: "40%", color: "var(--magenta)", delay: 0.8 },
+  ], []);
+
+  return (
+    <>
+      {shapes.map((s, i) => (
+        <motion.div
+          key={i}
+          className="hero-shape"
+          style={{
+            width: s.size,
+            height: s.size,
+            left: s.x,
+            top: s.y,
+            background: s.color,
+          }}
+          animate={{
+            y: [0, -20, 0, 15, 0],
+            x: [0, 10, 0, -8, 0],
+            scale: [1, 1.1, 1, 0.95, 1],
+          }}
+          transition={{
+            duration: 8,
+            delay: s.delay,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+    </>
+  );
+}
+
+/* ═══════════════════ ABOUT ═══════════════════ */
 function About() {
   const content = useStore((s) => s.content);
   return (
-    <section id="about" className="relative overflow-hidden">
+    <section id="about" className="relative mx-auto max-w-7xl px-6 py-20 md:px-14">
       <motion.div
-        initial={{ opacity: 0, x: 100 }}
-        whileInView={{ opacity: 0.15, x: 0 }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 1 }}
-        className="text-display absolute right-0 top-10 text-[18vw] text-brand-blue/30 md:text-[12vw]"
+        className="pointer-events-none absolute right-6 top-10 z-0 select-none font-display text-[150px] leading-none text-brand-paper2 md:text-[200px]"
       >
         2014
       </motion.div>
 
-      <div className="mx-auto grid max-w-7xl gap-14 px-6 md:grid-cols-2 md:px-16">
-        <div>
-          <FadeUp>
-            <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-brand-blue">
-              <span className="h-px w-8 bg-brand-blue" /> WHO WE ARE
-            </div>
-          </FadeUp>
-          <FadeUp delay={0.1}>
-            <h2 className="text-display text-5xl text-primary md:text-7xl">
-              DECADE OF <span className="text-brand-blue">IMPACT.</span>
-            </h2>
-          </FadeUp>
-          <div className="mt-8 space-y-5 text-[15px] leading-relaxed text-muted-foreground md:text-base">
-            {content.aboutText.map((t, i) => (
-              <FadeUp key={i} delay={0.2 + i * 0.1}>
-                <p>{t}</p>
-              </FadeUp>
-            ))}
+      <div className="relative z-10">
+        <FadeUp>
+          <div className="mb-4 flex items-center gap-2">
+            <span className="h-[2px] w-[26px] bg-brand-magenta" />
+            <span className="text-[12px] font-semibold tracking-[2px] text-brand-teal">
+              OUR STORY
+            </span>
           </div>
-        </div>
+        </FadeUp>
 
-        <div className="flex items-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 40 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="relative w-full rounded-2xl bg-primary p-10 text-white shadow-2xl shadow-primary/30 md:p-14"
-          >
-            <motion.div
-              animate={{ y: [0, -5, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <div className="text-italic-display text-3xl leading-snug md:text-5xl">
-                "{content.tagline}"
+        <FadeUp delay={0.1}>
+          <h2 className="mb-10 font-display text-[48px] leading-[1.02] tracking-[-0.5px] text-brand-ink md:text-[54px]">
+            Decade of<br />
+            <span className="misreg">
+              <span className="layer c">impact.</span>
+              <span className="layer m">impact.</span>
+              <span className="layer y">impact.</span>
+              <span className="base">impact.</span>
+            </span>
+          </h2>
+        </FadeUp>
+
+        <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <div className="mb-8 space-y-5 text-[16px] leading-[1.75] text-[#524d46]">
+              {content.aboutText.map((t, i) => (
+                <FadeUp key={i} delay={0.2 + i * 0.1}>
+                  <p>{t}</p>
+                </FadeUp>
+              ))}
+            </div>
+
+            {/* Animated Stats */}
+            <div className="mt-10 flex flex-wrap gap-[14px]">
+              <FadeUp delay={0.4}>
+                <div className="stat-pill flex items-baseline gap-2 rounded-[40px] bg-brand-ink px-[22px] py-[14px] text-brand-paper">
+                  <AnimatedCounter to={10} className="font-display text-[19px] text-brand-magenta" />
+                  <span className="text-[11px] font-semibold tracking-[1.5px] text-[#cfc9bd]">YEARS</span>
+                </div>
+              </FadeUp>
+              <FadeUp delay={0.5}>
+                <div className="stat-pill flex items-baseline gap-2 rounded-[40px] bg-brand-ink px-[22px] py-[14px] text-brand-paper">
+                  <AnimatedCounter to={500} className="font-display text-[19px] text-brand-cyan" />
+                  <span className="text-[11px] font-semibold tracking-[1.5px] text-[#cfc9bd]">CLIENTS</span>
+                </div>
+              </FadeUp>
+              <FadeUp delay={0.6}>
+                <div className="stat-pill flex items-baseline gap-2 rounded-[40px] bg-brand-ink px-[22px] py-[14px] text-brand-paper">
+                  <AnimatedCounter to={1000} className="font-display text-[19px] text-brand-yellow" />
+                  <span className="text-[11px] font-semibold tracking-[1.5px] text-[#cfc9bd]">PROJECTS</span>
+                </div>
+              </FadeUp>
+            </div>
+          </div>
+
+          {/* Quote card */}
+          <FadeUp delay={0.3}>
+            <div className="relative overflow-hidden rounded-[10px] bg-brand-ink px-10 py-11">
+              <div
+                className="absolute inset-x-0 top-0 h-[5px]"
+                style={{
+                  background: "linear-gradient(90deg, var(--color-brand-magenta), var(--color-brand-yellow) 50%, var(--color-brand-cyan))",
+                }}
+              />
+              <div className="absolute bottom-5 right-5 h-5 w-5 opacity-55">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#a8a29a" strokeWidth="1"/><line x1="12" y1="1" x2="12" y2="23" stroke="#a8a29a" strokeWidth="1"/><line x1="1" y1="12" x2="23" y2="12" stroke="#a8a29a" strokeWidth="1"/></svg>
               </div>
-              <div className="mt-8 flex items-center gap-4">
-                <span className="h-px w-12 bg-brand-blue" />
-                <span className="text-xs font-semibold tracking-[0.25em] text-white/70">
+              
+              <motion.div
+                initial={{ scale: 0, rotate: -20 }}
+                whileInView={{ scale: 1, rotate: 0 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                className="mb-2 font-italic-display text-[52px] leading-[0.6] text-brand-yellow"
+              >
+                &ldquo;
+              </motion.div>
+              <div className="mb-7 font-italic-display text-[30px] leading-[1.28] text-brand-paper">
+                You imagine,<br />we create.
+              </div>
+              <div className="flex items-center gap-2.5">
+                <div className="h-[2px] w-[22px] bg-brand-cyan" />
+                <span className="text-[11.5px] font-semibold tracking-[2px] text-[#a8a29a]">
                   GURU GRAPHICS, SURAT
                 </span>
               </div>
-            </motion.div>
-          </motion.div>
+              
+              <div className="mt-5 flex gap-2">
+                {["bg-brand-magenta", "bg-brand-cyan", "bg-brand-yellow", "bg-brand-teal"].map((c, i) => (
+                  <motion.div
+                    key={c}
+                    className={`h-[26px] w-[26px] rounded-full border-2 border-brand-ink ${c}`}
+                    whileHover={{ scale: 1.3, rotate: 180 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  />
+                ))}
+              </div>
+            </div>
+          </FadeUp>
         </div>
       </div>
     </section>
   );
 }
 
-/* ---------------- Stats ---------------- */
-function Stats() {
-  const stats = [
-    { n: 10, label: "YEARS" },
-    { n: 500, label: "CLIENTS" },
-    { n: 1000, label: "PROJECTS" },
-  ];
-  return (
-    <section className="py-10">
-      <div className="mx-auto flex max-w-7xl flex-wrap justify-center gap-5 px-6 md:justify-start md:px-16">
-        {stats.map((s, i) => (
-          <motion.div
-            key={s.label}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.12, duration: 0.6 }}
-            className="flex items-center gap-4 rounded-full bg-primary px-7 py-4 shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-primary/40"
-          >
-            <Counter to={s.n} />
-            <span className="text-xs font-semibold tracking-[0.3em] text-white/70">
-              {s.label}
-            </span>
-          </motion.div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function Counter({ to }: { to: number }) {
+/* ═══════════════════ ANIMATED COUNTER ═══════════════════ */
+function AnimatedCounter({ to, className }: { to: number; className?: string }) {
   const [val, setVal] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
           const start = performance.now();
-          const dur = 1400;
+          const dur = 1800;
           const tick = (now: number) => {
             const p = Math.min(1, (now - start) / dur);
-            setVal(Math.floor(to * (1 - Math.pow(1 - p, 3))));
+            // Ease out cubic
+            const eased = 1 - Math.pow(1 - p, 3);
+            setVal(Math.floor(to * eased));
             if (p < 1) requestAnimationFrame(tick);
           };
           requestAnimationFrame(tick);
@@ -475,53 +575,94 @@ function Counter({ to }: { to: number }) {
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [to]);
-  return (
-    <span ref={ref} className="text-display text-2xl text-brand-blue">
-      {val}+
-    </span>
-  );
+  }, [to, hasAnimated]);
+  
+  return <span ref={ref} className={className}>{val}+</span>;
 }
 
-/* ---------------- Services ---------------- */
+/* ═══════════════════ SERVICES ═══════════════════ */
 function Services({ onNav }: { onNav: (id: string) => void }) {
   const allServices = useStore((s) => s.services);
   const services = allServices.filter((x) => x.active);
+  const [filter, setFilter] = useState("All");
+
+  const categories = useMemo(() => {
+    const cats = new Set(services.map(s => s.category));
+    return ["All", ...Array.from(cats)];
+  }, [services]);
+
+  const filteredServices = useMemo(() => {
+    if (filter === "All") return services;
+    return services.filter(s => s.category === filter);
+  }, [services, filter]);
+
   return (
-    <section id="services" className="py-14 md:py-12">
+    <section id="services" className="py-20 md:py-24">
       <div className="mx-auto max-w-7xl px-6 md:px-16">
         <FadeUp>
-          <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-brand-blue">
-            <span className="h-px w-8 bg-brand-blue" /> DO YOU NEED A PROFESSIONAL
+          <div className="mb-4 flex items-center gap-2 text-[12px] font-semibold tracking-[2px] text-brand-teal">
+            <span className="h-[2px] w-[26px] bg-brand-magenta" /> DO YOU NEED A PROFESSIONAL
           </div>
         </FadeUp>
         <FadeUp delay={0.1}>
-          <h2 className="text-display text-5xl text-primary md:text-8xl">
-            GRAPHIC & PRINTING WORKS
+          <h2 className="font-display text-[48px] leading-[1.02] tracking-[-0.5px] text-brand-ink md:text-[54px]">
+            Graphic &amp; Printing Works
           </h2>
         </FadeUp>
 
-        <div className="mt-16 grid grid-cols-1 divide-y divide-border sm:grid-cols-2 sm:divide-x lg:grid-cols-4">
-          {services.map((s, i) => (
-            <motion.button
-              key={s.id}
-              onClick={() => onNav("contact")}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ delay: (i % 8) * 0.05, duration: 0.5 }}
-              className="group relative flex items-center gap-4 border-b border-border py-6 text-left transition-all hover:bg-brand-blue/[0.04] sm:px-6 hover:pl-8"
-            >
-              <ArrowUpRight className="h-5 w-5 shrink-0 text-brand-blue transition-transform group-hover:rotate-45" />
-              <span className="text-lg font-semibold text-primary transition-colors group-hover:text-brand-blue">
-                {s.name}
-              </span>
-            </motion.button>
-          ))}
-        </div>
+        {/* Category Filter Tabs */}
+        <FadeUp delay={0.15}>
+          <div className="mt-10 flex flex-wrap gap-3">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setFilter(cat)}
+                className={`category-tab ${filter === cat ? "active" : ""}`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </FadeUp>
+
+        {/* Service Cards Grid */}
+        <motion.div
+          layout
+          className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          <AnimatePresence mode="popLayout">
+            {filteredServices.map((s, i) => {
+              const IconComp = SERVICE_ICONS[s.name] || Sparkles;
+              const catClass = s.category === "Print" ? "cat-print" : s.category === "Signage" ? "cat-signage" : "cat-design";
+              return (
+                <motion.button
+                  key={s.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ delay: (i % 8) * 0.04, duration: 0.35 }}
+                  onClick={() => onNav("contact")}
+                  className={`service-card ${catClass} text-left`}
+                >
+                  <div className="icon-wrap">
+                    <IconComp className="h-5 w-5" />
+                  </div>
+                  <div className="text-[16px] font-semibold text-brand-ink">
+                    {s.name}
+                  </div>
+                  <div className="mt-1.5 text-[12px] font-medium tracking-[1px] text-[#8a857d]">
+                    {s.category.toUpperCase()}
+                  </div>
+                  <ArrowUpRight className="absolute right-4 top-4 h-4 w-4 text-[#cfc9bd] transition-all group-hover:text-brand-magenta" />
+                </motion.button>
+              );
+            })}
+          </AnimatePresence>
+        </motion.div>
 
         <FadeUp>
-          <p className="mt-12 text-center text-lg italic text-muted-foreground">
+          <p className="mt-14 text-center font-italic-display text-[28px] text-[#8a857d]">
             One studio. Every print. Endless possibilities.
           </p>
         </FadeUp>
@@ -530,27 +671,27 @@ function Services({ onNav }: { onNav: (id: string) => void }) {
   );
 }
 
-/* ---------------- Clients ---------------- */
+/* ═══════════════════ CLIENTS ═══════════════════ */
 function Clients() {
   const clients = useStore((s) => s.content.clients);
   const row1 = clients.slice(0, Math.ceil(clients.length / 2));
   const row2 = clients.slice(Math.ceil(clients.length / 2));
   return (
-    <section id="clients" className="overflow-hidden py-14 md:py-12">
+    <section id="clients" className="overflow-hidden py-10 md:py-16">
       <div className="mx-auto max-w-7xl px-6 md:px-16">
         <FadeUp>
-          <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-brand-blue">
-            <span className="h-px w-8 bg-brand-blue" /> TRUSTED BY
+          <div className="mb-4 flex items-center gap-2 text-[12px] font-semibold tracking-[2px] text-brand-teal">
+            <span className="h-[2px] w-[26px] bg-brand-magenta" /> TRUSTED BY
           </div>
         </FadeUp>
         <div className="flex flex-wrap items-end justify-between gap-6">
           <FadeUp delay={0.1}>
-            <h2 className="text-display text-5xl text-primary md:text-7xl">
-              BRANDS THAT BELIEVE IN US.
+            <h2 className="font-display text-[48px] leading-[1.02] tracking-[-0.5px] text-brand-ink md:text-[54px]">
+              Brands that<br/>believe in us.
             </h2>
           </FadeUp>
           <FadeUp delay={0.2}>
-            <p className="max-w-sm text-sm text-muted-foreground">
+            <p className="max-w-[400px] text-[16px] leading-[1.75] text-[#524d46]">
               {clients.length}+ brands have trusted us since 2014 — from neighbourhood shops
               to national labels.
             </p>
@@ -569,27 +710,28 @@ function Clients() {
 function Marquee({ items, reverse }: { items: string[]; reverse?: boolean }) {
   const doubled = [...items, ...items];
   return (
-    <div className="relative overflow-hidden">
-      <div
+    <div className="marquee-wrapper">
+      <motion.div
         className="marquee-track flex w-max gap-6"
-        style={{ animationDirection: reverse ? "reverse" : "normal" }}
+        animate={{ x: reverse ? ["-50%", "0%"] : ["0%", "-50%"] }}
+        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
       >
         {doubled.map((name, i) => (
           <div
             key={i}
-            className="grid h-24 w-52 shrink-0 place-items-center rounded-xl border border-border bg-card px-6 shadow-sm"
+            className="client-card grid h-[80px] w-[220px] shrink-0 place-items-center rounded-[4px] border border-brand-ink bg-brand-paper2 px-6 shadow-[4px_4px_0_0_var(--color-brand-ink)]"
           >
-            <span className="text-center text-sm font-bold tracking-wider text-primary/70">
+            <span className="text-center font-display text-[15px] tracking-[1px] text-brand-ink">
               {name.toUpperCase()}
             </span>
           </div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 }
 
-/* ---------------- Contact ---------------- */
+/* ═══════════════════ CONTACT ═══════════════════ */
 function Contact() {
   const contact = useStore((s) => s.contact);
   const allServices = useStore((s) => s.services);
@@ -597,6 +739,7 @@ function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const waLink = `https://wa.me/${contact.whatsapp.replace(/\D/g, "")}?text=Hi%20Guru%20Graphics!%20I%27d%20like%20to%20get%20a%20quote.`;
 
@@ -628,116 +771,113 @@ function Contact() {
   };
 
   return (
-    <section id="contact" className="relative overflow-hidden py-14 md:py-12">
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 0.08 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1 }}
-        className="text-display pointer-events-none absolute inset-x-0 top-10 text-center text-[22vw] text-primary"
-      >
-        SAY HELLO
-      </motion.div>
-
+    <section id="contact" className="relative overflow-hidden py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6 md:px-16">
         <FadeUp>
-          <div className="mb-4 flex items-center gap-3 text-sm font-semibold tracking-[0.3em] text-brand-blue">
-            <span className="h-px w-8 bg-brand-blue" /> GET IN TOUCH
+          <div className="mb-4 flex items-center gap-2 text-[12px] font-semibold tracking-[2px] text-brand-teal">
+            <span className="h-[2px] w-[26px] bg-brand-magenta" /> GET IN TOUCH
           </div>
         </FadeUp>
         <FadeUp delay={0.1}>
-          <h2 className="text-display text-5xl text-primary md:text-8xl">
-            LET'S CREATE{" "}
-            <span className="text-italic-display font-bold text-brand-blue">
-              Something
-            </span>{" "}
-            GREAT.
+          <h2 className="font-display text-[48px] leading-[1.02] tracking-[-0.5px] text-brand-ink md:text-[54px]">
+            Let's create<br/>
+            <span className="font-italic-display text-brand-magenta">Something</span><br/>
+            great.
           </h2>
         </FadeUp>
 
-        <div className="mt-16 grid gap-8 lg:grid-cols-2">
+        <div className="mt-16 grid gap-16 lg:grid-cols-[0.9fr_1.1fr]">
           {/* Left cards */}
-          <div className="space-y-5">
+          <div className="space-y-6">
             <a
               href={waLink}
               target="_blank"
               rel="noreferrer"
-              className="group flex items-center justify-between rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+              className="group flex items-center justify-between rounded-[4px] border-2 border-brand-ink bg-brand-yellow p-6 shadow-[6px_6px_0_0_var(--color-brand-ink)] transition-all duration-300 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[4px_4px_0_0_var(--color-brand-ink)]"
             >
-              <div className="flex items-center gap-4">
-                <span className="grid h-12 w-12 place-items-center rounded-full bg-brand-blue text-white">
-                  <MessageCircle className="h-5 w-5" />
-                </span>
+              <div className="flex items-center gap-5">
+                <motion.span
+                  whileHover={{ rotate: [0, -10, 10, -10, 0] }}
+                  transition={{ duration: 0.5 }}
+                  className="grid h-[52px] w-[52px] place-items-center rounded-full border-2 border-brand-ink bg-brand-paper"
+                >
+                  <MessageCircle className="h-6 w-6 text-brand-ink" />
+                </motion.span>
                 <div>
-                  <div className="text-[11px] font-semibold tracking-[0.25em] text-muted-foreground">
+                  <div className="text-[12px] font-bold tracking-[2px] text-brand-ink">
                     WHATSAPP US
                   </div>
-                  <div className="text-lg font-bold text-primary">{contact.phone}</div>
+                  <div className="font-display text-[20px] text-brand-ink">{contact.phone}</div>
                 </div>
               </div>
-              <ArrowUpRight className="h-5 w-5 text-primary transition-transform group-hover:rotate-45" />
+              <ArrowUpRight className="h-6 w-6 text-brand-ink transition-transform duration-300 group-hover:rotate-45" />
             </a>
 
-            <div className="grid gap-5 sm:grid-cols-2">
-              <InfoCard icon={<Phone className="h-4 w-4" />} label="OFFICE" value={contact.phone} />
-              <InfoCard icon={<Mail className="h-4 w-4" />} label="EMAIL" value={contact.email} />
-              <InfoCard icon={<Camera className="h-4 w-4" />} label="INSTAGRAM" value={contact.instagram} />
-              <InfoCard
-                icon={<MapPin className="h-4 w-4" />}
-                label="STUDIO"
-                value={contact.address}
-              />
+            <div className="grid gap-6 sm:grid-cols-2">
+              <InfoCard icon={<Phone className="h-[18px] w-[18px]" />} label="OFFICE" value={contact.phone} />
+              <InfoCard icon={<Mail className="h-[18px] w-[18px]" />} label="EMAIL" value={contact.email} />
+              <InfoCard icon={<Camera className="h-[18px] w-[18px]" />} label="INSTAGRAM" value={contact.instagram} />
+              <InfoCard icon={<MapPin className="h-[18px] w-[18px]" />} label="STUDIO" value={contact.address} />
             </div>
           </div>
 
           {/* Form */}
           <motion.form
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            ref={formRef}
+            initial={{ opacity: 0, x: 40 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
             onSubmit={handleSubmit}
-            className="relative z-10 rounded-3xl border border-border bg-card p-8 shadow-xl shadow-primary/5 md:p-10"
+            className="relative overflow-hidden rounded-[8px] border border-border bg-brand-paper p-8 shadow-[0_10px_40px_rgba(21,19,18,0.06)] md:p-10"
           >
-            <h3 className="text-display text-3xl text-primary">SEND US A MESSAGE.</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <h3 className="font-display text-[32px] text-brand-ink">SEND US A MESSAGE</h3>
+            <p className="mt-2 text-[15px] text-[#8a857d]">
               We typically respond within 24 hours.
             </p>
 
-            {submitted && (
-              <div className="mt-4 rounded-xl bg-brand-green/10 border border-brand-green/30 px-4 py-3 text-sm font-medium text-brand-green">
-                ✓ Thank you! Your enquiry has been received. We'll be in touch shortly.
-              </div>
-            )}
+            <AnimatePresence>
+              {submitted && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mt-6 rounded border border-[#0B6E4F] bg-[#0b6e4f0f] px-5 py-4 text-[14.5px] font-medium text-brand-teal"
+                >
+                  ✓ Thank you! Your enquiry has been received. We'll be in touch shortly.
+                  <ConfettiBurst />
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {error && (
-              <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm font-medium text-red-700">
+              <div className="mt-6 rounded border border-brand-magenta bg-[#D6006F0f] px-5 py-4 text-[14.5px] font-medium text-brand-magenta">
                 ⚠ {error}
               </div>
             )}
 
-            <div className="mt-8 grid gap-6 sm:grid-cols-2">
-              <Field label="Full Name *" name="name" required />
-              <Field label="Phone Number *" name="phone" required />
-              <Field label="Email Address" name="email" type="email" />
+            <div className="mt-8 grid gap-7 sm:grid-cols-2">
+              <FloatingField label="Full Name *" name="name" required />
+              <FloatingField label="Phone Number *" name="phone" required />
+              <FloatingField label="Email Address" name="email" type="email" />
               <SelectField
                 label="Service Needed *"
                 name="service"
                 options={services.map((s) => s.name)}
               />
               <div className="sm:col-span-2">
-                <Field label="Tell us about your project *" name="project" as="textarea" required />
+                <FloatingField label="Tell us about your project *" name="project" as="textarea" required />
               </div>
             </div>
 
-            <button
+            <motion.button
               type="submit"
               disabled={submitting}
-              className="group mt-10 inline-flex items-center gap-3 rounded-full bg-brand-blue px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-brand-blue/30 transition-transform hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="btn-primary mt-10 w-full disabled:opacity-60"
+              whileTap={{ scale: 0.98 }}
             >
-              {submitting ? "Sending..." : "Send Enquiry"}
-              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:rotate-45" />
-            </button>
+              <span>{submitting ? "Sending..." : "Send Enquiry"}</span>
+            </motion.button>
           </motion.form>
         </div>
       </div>
@@ -745,21 +885,58 @@ function Contact() {
   );
 }
 
-function InfoCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+/* ═══════════════════ CONFETTI ═══════════════════ */
+function ConfettiBurst() {
+  const colors = ["var(--magenta)", "var(--cyan)", "var(--yellow)", "var(--teal)"];
+  const pieces = useMemo(() => Array.from({ length: 20 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    color: colors[i % colors.length],
+    delay: Math.random() * 0.4,
+    size: 6 + Math.random() * 6,
+  })), []);
+  
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <div className="mb-3 grid h-8 w-8 place-items-center rounded-full bg-brand-blue/10 text-brand-blue">
-        {icon}
-      </div>
-      <div className="text-[10px] font-semibold tracking-[0.25em] text-muted-foreground">
-        {label}
-      </div>
-      <div className="mt-1 text-sm font-semibold text-primary">{value}</div>
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {pieces.map((p) => (
+        <motion.div
+          key={p.id}
+          className="confetti-piece"
+          style={{
+            left: `${p.x}%`,
+            top: "-10px",
+            width: p.size,
+            height: p.size,
+            background: p.color,
+          }}
+          initial={{ y: -10, opacity: 1, rotate: 0 }}
+          animate={{ y: 200, opacity: 0, rotate: 360 + Math.random() * 360 }}
+          transition={{ duration: 1 + Math.random() * 0.5, delay: p.delay, ease: "easeOut" }}
+        />
+      ))}
     </div>
   );
 }
 
-function Field({
+function InfoCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="info-card rounded-[4px] border border-border bg-brand-paper2 p-6 shadow-sm">
+      <motion.div
+        whileHover={{ scale: 1.15 }}
+        className="info-icon mb-4 grid h-[42px] w-[42px] place-items-center rounded-full bg-brand-ink text-brand-paper transition-colors"
+      >
+        {icon}
+      </motion.div>
+      <div className="mb-1.5 text-[11px] font-semibold tracking-[2px] text-[#8a857d]">
+        {label}
+      </div>
+      <div className="text-[14.5px] font-semibold text-brand-ink">{value}</div>
+    </div>
+  );
+}
+
+/* ═══════════════════ FLOATING FIELD ═══════════════════ */
+function FloatingField({
   label,
   name,
   type = "text",
@@ -774,16 +951,16 @@ function Field({
 }) {
   const Component = as;
   return (
-    <label className="block">
-      <span className="text-xs font-medium text-muted-foreground">{label}</span>
+    <div className="float-field">
       <Component
         type={as === "input" ? type : undefined}
         name={name}
         required={required}
+        placeholder=" "
         rows={as === "textarea" ? 4 : undefined}
-        className="mt-1 w-full border-0 border-b border-border bg-transparent py-2 text-primary outline-none transition-colors focus:border-brand-blue resize-none"
       />
-    </label>
+      <label>{label}</label>
+    </div>
   );
 }
 
@@ -804,68 +981,80 @@ function SelectField({ label, name, options }: { label: string; name: string; op
 
   return (
     <div className="relative block" ref={ref}>
-      <span className="text-xs font-medium text-muted-foreground">{label}</span>
+      <span className="text-[12px] font-semibold tracking-[0.5px] text-[#8a857d]">{label}</span>
       <input type="hidden" name={name} value={selected} />
 
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="mt-1 flex w-full items-center justify-between border-0 border-b border-border bg-transparent py-2 text-left text-primary outline-none transition-colors focus:border-brand-blue"
+        className="mt-2 flex w-full items-center justify-between rounded-[3px] border-[1.5px] border-border bg-brand-paper2 px-4 py-3 text-left text-[14.5px] font-medium text-brand-ink outline-none transition-all focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(214,0,111,0.08)]"
       >
-        <span className={selected ? "text-primary" : "text-muted-foreground/50"}>
+        <span className={selected ? "text-brand-ink" : "text-[#8a857d]"}>
           {selected || "Select a service..."}
         </span>
-        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-4 w-4 text-[#8a857d] transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
 
-      {open && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-60 overflow-auto rounded-xl border border-border bg-card p-2 shadow-xl shadow-primary/10">
-          {options.map((o) => (
-            <button
-              key={o}
-              type="button"
-              onClick={() => {
-                setSelected(o);
-                setOpen(false);
-              }}
-              className={`w-full rounded-md px-4 py-2.5 text-left text-sm transition-colors hover:bg-primary/[0.04] ${selected === o ? "bg-primary/[0.04] font-medium text-brand-blue" : "text-primary"
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-auto rounded-[6px] border border-border bg-brand-paper py-1 shadow-lg"
+          >
+            {options.map((o) => (
+              <button
+                key={o}
+                type="button"
+                onClick={() => {
+                  setSelected(o);
+                  setOpen(false);
+                }}
+                className={`w-full px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-brand-paper2 hover:text-brand-magenta ${
+                  selected === o ? "bg-brand-paper2 font-semibold text-brand-magenta" : "font-medium text-brand-ink"
                 }`}
-            >
-              {o}
-            </button>
-          ))}
-        </div>
-      )}
+              >
+                {o}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-/* ---------------- Footer ---------------- */
+/* ═══════════════════ FOOTER ═══════════════════ */
 function Footer({ onNav }: { onNav: (id: string) => void }) {
   const contact = useStore((s) => s.contact);
   const content = useStore((s) => s.content);
   const waLink = `https://wa.me/${contact.whatsapp.replace(/\D/g, "")}?text=Hi%20Guru%20Graphics!%20I%27d%20like%20to%20get%20a%20quote.`;
   return (
-    <footer className="relative overflow-hidden border-t-4 border-brand-blue pt-16 pb-8">
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 md:grid-cols-3 md:px-16">
+    <footer className="relative overflow-hidden bg-brand-paper2 pt-0 pb-8">
+      {/* Gradient Divider */}
+      <div className="footer-divider" />
+      
+      <div className="mx-auto grid max-w-7xl gap-10 px-6 pt-16 md:grid-cols-3 md:px-16">
         <div>
           <Logo />
-          <p className="text-italic-display mt-6 text-xl text-primary">
+          <p className="font-italic-display mt-6 text-[22px] leading-snug text-brand-ink">
             "{content.tagline}"
           </p>
-          <p className="mt-4 max-w-xs text-sm text-muted-foreground">
-            Premium printing & graphic design from Surat, India — since 2014.
+          <p className="mt-4 max-w-xs text-[14.5px] text-[#8a857d]">
+            Premium printing &amp; graphic design from Surat, India — since 2014.
           </p>
         </div>
 
         <div>
-          <div className="text-[11px] font-semibold tracking-[0.3em] text-brand-blue">EXPLORE</div>
-          <ul className="mt-4 space-y-3">
+          <div className="text-[11.5px] font-semibold tracking-[2px] text-brand-teal">EXPLORE</div>
+          <ul className="mt-5 space-y-3">
             {NAV.map((n) => (
               <li key={n.id}>
                 <button
                   onClick={() => onNav(n.id)}
-                  className="text-primary hover:text-brand-blue"
+                  className="footer-link text-[14.5px] font-semibold text-brand-ink hover:text-brand-magenta"
                 >
                   {n.label}
                 </button>
@@ -875,46 +1064,53 @@ function Footer({ onNav }: { onNav: (id: string) => void }) {
         </div>
 
         <div>
-          <div className="text-[11px] font-semibold tracking-[0.3em] text-brand-blue">REACH US</div>
-          <ul className="mt-4 space-y-3 text-sm text-primary">
+          <div className="text-[11.5px] font-semibold tracking-[2px] text-brand-teal">REACH US</div>
+          <ul className="mt-5 space-y-3 text-[14.5px] font-medium text-brand-ink">
             <li>{contact.phone}</li>
             <li>{contact.email}</li>
-            <li className="text-muted-foreground">{contact.address}</li>
+            <li className="text-[#8a857d]">{contact.address}</li>
           </ul>
-          <div className="mt-5 flex gap-3">
+          <div className="mt-6 flex gap-3">
             <a
               href={waLink}
               target="_blank"
               rel="noreferrer"
-              className="grid h-10 w-10 place-items-center rounded-full border border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white"
+              className="social-icon grid h-10 w-10 place-items-center rounded-[3px] border border-brand-ink text-brand-ink hover:bg-[#25D366] hover:text-white hover:border-[#25D366]"
             >
-              <MessageCircle className="h-4 w-4" />
+              <MessageCircle className="h-[18px] w-[18px]" />
             </a>
             <a
               href={`https://instagram.com/${contact.instagram.replace("@", "")}`}
               target="_blank"
               rel="noreferrer"
-              className="grid h-10 w-10 place-items-center rounded-full border border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
+              className="social-icon grid h-10 w-10 place-items-center rounded-[3px] border border-brand-ink text-brand-ink hover:bg-brand-magenta hover:text-white hover:border-brand-magenta"
             >
-              <Camera className="h-4 w-4" />
+              <Camera className="h-[18px] w-[18px]" />
             </a>
           </div>
         </div>
       </div>
 
-      <div className="text-display pointer-events-none mt-12 select-none overflow-hidden text-center text-[18vw] leading-none text-primary/[0.06]">
-        GURU GRAPHICS
+      <div className="pointer-events-none mt-16 select-none overflow-hidden border-t border-brand-ink/10 pt-4 text-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 0.05 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1 }}
+          className="whitespace-nowrap font-display text-[14vw] leading-none text-brand-ink"
+        >
+          GURU GRAPHICS
+        </motion.div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 text-center text-xs text-muted-foreground md:px-16">
-        © {new Date().getFullYear()} Guru Graphics · Designed with care.
+      <div className="mx-auto max-w-7xl px-6 text-center text-[12px] font-medium text-[#8a857d] md:px-16 mt-4">
+        &copy; {new Date().getFullYear()} Guru Graphics &middot; Designed with care.
       </div>
     </footer>
   );
 }
 
-
-/* ---------------- Utilities ---------------- */
+/* ═══════════════════ UTILITIES ═══════════════════ */
 function FadeUp({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   return (
     <motion.div
@@ -940,7 +1136,7 @@ function BackToTop() {
       initial={false}
       animate={{ opacity: show ? 1 : 0, scale: show ? 1 : 0.5 }}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed bottom-24 right-6 md:bottom-28 md:right-10 z-40 grid h-12 w-12 place-items-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/40 transition-colors hover:bg-brand-blue/90"
+      className="fixed bottom-24 right-6 z-40 grid h-12 w-12 place-items-center rounded-full border-2 border-brand-ink bg-brand-cyan text-brand-ink shadow-lg transition-transform hover:scale-110 md:bottom-28 md:right-10"
       aria-label="Back to top"
     >
       <ArrowUp className="h-5 w-5" />
